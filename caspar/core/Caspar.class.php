@@ -250,9 +250,6 @@
 				require $filename_alternate;
 				return;
 			}
-			$filename = (isset($filename)) ? $filename : null;
-			$filename_alternate = (isset($filename_alternate)) ? $filename_alternate : null;
-			throw new \Exception("Class {$classname} not found, even though we tried both '{$filename}' and '{$filename_alternate}'");
 		}
 		
 		/**
