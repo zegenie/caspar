@@ -1,0 +1,8 @@
+# b2db database configuration
+
+default:
+  hostname: ''
+  username: ''
+  password: ''
+  dsn: ''
+  tableprefix: ''

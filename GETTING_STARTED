@@ -1,0 +1,18 @@
+* GETTING STARTED *
+
+The Caspar framework is found in the caspar/ subfolder of the download (or in
+the repository on github).
+
+In addition to this, there are two other main folders:
+ * "application" - this is where your application is located, including routing
+                   configuration, database configuration, class files, etc.
+
+ * "public" - this is the webroot folder. You can either set up url rewriting
+              so this folder is the documentroot for the server where your
+              application is located, or edit the public/index.php so the
+              basepath (CASPAR_PATH) is correct.
+
+Caspar expects the application/ subfolder to be located next to the caspar
+folder. If you want to put the Caspar framework files in one central location
+to be used by all your applications, you can specify a custom
+CASPAR_APPLICATION_PATH in public/index.php.

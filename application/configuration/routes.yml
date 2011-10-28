@@ -1,0 +1,6 @@
+# Application routes
+
+home:
+  url: /
+  module: main
+  action: index
