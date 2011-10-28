@@ -131,6 +131,12 @@
 		 */
 		protected $_project_menu_strip_visible = true;
 
+		public function __construct($javascripts = array(), $stylesheets = array())
+		{
+			$this->_javascripts = $javascripts;
+			$this->_stylesheets = $stylesheets;
+		}
+		
 		public function ajaxResponseText($code, $error)
 		{
 			$ob_status = ob_get_status();
@@ -276,20 +282,14 @@
 		 * Add a javascript
 		 *
 		 * @param string $javascript javascript name
-		 * @param bool $minify Run through minify/content server
 		 * @param bool $important Mark this script for being loaded before others
 		 */
-		public function addJavascript($javascript, $minify = true, $important = false)
+		public function addJavascript($javascript, $important = false)
 		{
-			if ($important)
-			{
-				$temp = array();
-				$temp[$javascript] = $minify;
-				$this->_javascripts = array_merge($temp, $this->_javascripts);
-			}
-			else
-			{
-				$this->_javascripts[$javascript] = $minify;
+			if ($important) {
+				array_unshift($javascript, $this->_javascripts);
+			} else {
+				$this->_javascripts[$javascript] = $javascript;
 			}
 		}
 		
@@ -297,20 +297,14 @@
 		 * Add a stylesheet
 		 *
 		 * @param string $stylesheet stylesheet name
-		 * @param bool $minify Run through minify/content server
 		 * @param bool $important Mark this stylesheet for being loaded before others
 		 */
-		public function addStylesheet($stylesheet, $minify = true, $important = false)
+		public function addStylesheet($stylesheet, $important = false)
 		{
-			if ($important)
-			{
-				$temp = array();
-				$temp[$stylesheet] = $minify;
-				$this->_stylesheets = array_merge($temp, $this->_stylesheets);
-			}
-			else
-			{
-				$this->_stylesheets[$stylesheet] = $minify;
+			if ($important) {
+				array_unshift($stylesheet, $this->_stylesheets);
+			} else {
+				$this->_stylesheets[$stylesheet] = $stylesheet;
 			}
 		}
 

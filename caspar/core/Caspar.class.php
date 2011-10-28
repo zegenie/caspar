@@ -480,7 +480,7 @@
 		{
 			if (!is_object(self::$_response)) {
 				$classname = self::$_configuration['core']['response_classname'];
-				self::$_response = new $classname();
+				self::$_response = new $classname(self::$_configuration['core']['javascripts'], self::$_configuration['core']['stylesheets']);
 			}
 			return self::$_response;
 		}
