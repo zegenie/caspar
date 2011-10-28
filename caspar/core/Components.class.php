@@ -47,7 +47,7 @@
 			if (!isset($module_file)) $module_file = self::getModuleAndTemplate($template);
 			if (($template_name = Caspar::getI18n()->hasTranslatedTemplate($template, true)) === false)
 			{
-				$template_name = THEBUGGENIE_MODULES_PATH . $module_file['module'] . DS . 'templates' . DS . "_{$module_file['file']}.inc.php";
+				$template_name = \CASPAR_MODULES_PATH . $module_file['module'] . DS . 'templates' . DS . "_{$module_file['file']}.inc.php";
 			}
 			return $template_name;
 		}
@@ -80,7 +80,7 @@
 			list ($module_file, $actionClassName, $actionToRunName) = self::_getComponentDetails($template);
 			if (!class_exists($actionClassName))
 			{
-				Caspar::addAutoloaderClassPath(THEBUGGENIE_MODULES_PATH . $module_file['module'] . DS . 'classes' . DS);
+				Caspar::addAutoloaderClassPath(\CASPAR_MODULES_PATH . $module_file['module'] . DS . 'classes' . DS);
 			}
 			if (!class_exists($actionClassName))
 			{
