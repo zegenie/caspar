@@ -538,6 +538,11 @@
 			return $this->_base_title;
 		}
 		
+		public function setFaviconURL($favicon_url)
+		{
+			$this->_favicon_url = $favicon_url;
+		}
+		
 		public function getFaviconURL()
 		{
 			return $this->_favicon_url;
