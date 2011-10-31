@@ -22,14 +22,10 @@
 	 */
 	function image_tag($image, $params = array(), $relative = true)
 	{
-		if ($notheme) {
-			$params['src'] = $image;
-		} else {
-			$params['src'] = \caspar\core\Caspar::getTBGPath() . 'images/' . $image;
-		}
+		$params['src'] = $image;
 
 		if (!$relative) {
-			$params['src'] = \caspar\core\Caspar::getUrlHost() . $params['src'];
+			$params['src'] = \caspar\core\Caspar::getBaseURL() . $params['src'];
 		}
 		if (!array_key_exists('alt', $params) || !$params['alt']) {
 			$params['alt'] = $image;

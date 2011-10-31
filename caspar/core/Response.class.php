@@ -434,7 +434,7 @@
 		 */
 		public function setCookie($key, $value, $expiration = 864000)
 		{
-			setcookie($key, $value, NOW + $expiration, Caspar::getTBGPath());
+			setcookie($key, $value, NOW + $expiration, Caspar::getBaseURL());
 			return true;
 		}
 		
@@ -447,7 +447,7 @@
 		 */
 		public function deleteCookie($key)
 		{
-			setcookie($key, '', NOW - 36000, Caspar::getTBGPath());
+			setcookie($key, '', NOW - 36000, Caspar::getBaseURL());
 			return true;
 		}		
 

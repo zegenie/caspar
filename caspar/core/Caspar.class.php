@@ -313,37 +313,9 @@
 		 * 
 		 * @return string
 		 */
-		public static function getTBGPath()
+		public static function getBaseURL()
 		{
-			if (self::$_tbgpath === null)
-			{
-				self::_setTBGPath();
-			}
-			return self::$_tbgpath;
-		}
-		
-		/**
-		 * Get the subdirectory part of the url, stripped
-		 * 
-		 * @return string
-		 */
-		public static function getStrippedTBGPath()
-		{
-			if (self::$_stripped_tbgpath === null)
-			{
-				self::$_stripped_tbgpath = mb_substr(self::getTBGPath(), 0, mb_strlen(self::getTBGPath()) - 1);
-			}
-			return self::$_stripped_tbgpath;
-		}
-
-		/**
-		 * Set the subdirectory part of the url, from the url
-		 */
-		protected static function _setTBGPath()
-		{
-			self::$_tbgpath = defined('TBG_CLI') ? '.' : dirname($_SERVER['PHP_SELF']);
-			if (stristr(PHP_OS, 'WIN')) { self::$_tbgpath = str_replace("\\", "/", self::$_tbgpath); /* Windows adds a \ to the URL which we don't want */ }
-			if (self::$_tbgpath[strlen(self::$_tbgpath) - 1] != '/') self::$_tbgpath .= '/';
+			return self::$_configuration['core']['url'];
 		}
 		
 		/**
@@ -548,7 +520,7 @@
 			try
 			{
 				$classname = self::$_configuration['core']['user_classname'];
-				self::$_user = ($user === null) ? $classname::loginCheck(self::getRequest()->getParameter('tbg3_username'), self::getRequest()->getParameter('tbg3_password')) : $user;
+				self::$_user = ($user === null) ? $classname::loginCheck(self::getRequest()->getParameter('csp_username'), self::getRequest()->getParameter('csp_password')) : $user;
 				if (self::$_user->isAuthenticated())
 				{
 					if (self::$_user->isOffline() || self::$_user->isAway())
@@ -594,20 +566,13 @@
 		 */
 		public static function logout()
 		{
-			if (Settings::isUsingExternalAuthenticationBackend())
-			{
-				$mod = self::getModule(Settings::getAuthenticationBackend());
-				$mod->logout();
-			}
-			
-			Event::createNew('core', 'pre_logout')->trigger();
-			self::getResponse()->deleteCookie('tbg3_username');
-			self::getResponse()->deleteCookie('tbg3_password');
+			Event::createNew('caspar', 'caspar\pre_logout')->trigger();
+			self::getResponse()->deleteCookie('csp_username');
+			self::getResponse()->deleteCookie('csp_password');
 			self::getResponse()->deleteCookie('THEBUGGENIE');
 			session_regenerate_id(true);
-			Event::createNew('core', 'post_logout')->trigger();
+			Event::createNew('caspar', 'caspar\post_logout')->trigger();
 		}
-
 		
 		/**
 		 * Set a message to be retrieved in the next request
@@ -999,16 +964,16 @@
 			}
 		}
 
-		public static function calculateTimings(&$tbg_summary)
+		public static function calculateTimings(&$csp_summary)
 		{
 			$load_time = self::getLoadtime();
 			if (self::getB2DBInstance() instanceof \b2db\Connection)
 			{
-				$tbg_summary['db_queries'] = \b2db\Core::getSQLHits();
-				$tbg_summary['db_timing'] = \b2db\Core::getSQLTiming();
+				$csp_summary['db_queries'] = \b2db\Core::getSQLHits();
+				$csp_summary['db_timing'] = \b2db\Core::getSQLTiming();
 			}
-			$tbg_summary['load_time'] = ($load_time >= 1) ? round($load_time, 2) . ' seconds' : round($load_time * 1000, 1) . 'ms';
-			$tbg_summary['scope_id'] = \thebuggenie\core\Context::getScope() instanceof \thebuggenie\core\Scope ? \thebuggenie\core\Context::getScope()->getID() : 'unknown';
+			$csp_summary['load_time'] = ($load_time >= 1) ? round($load_time, 2) . ' seconds' : round($load_time * 1000, 1) . 'ms';
+			$csp_summary['scope_id'] = \thebuggenie\core\Context::getScope() instanceof \thebuggenie\core\Scope ? \thebuggenie\core\Context::getScope()->getID() : 'unknown';
 			self::ping();
 		}
 		
@@ -1066,11 +1031,6 @@
 				header("HTTP/1.0 404 Not Found", true, 404);
 				tbg_exception('An error occured', $e);
 			}
-		}
-
-		public static function getURLhost()
-		{
-			return self::getScope()->getCurrentHostname();
 		}
 
 		public static function isCLI()
@@ -1252,7 +1212,7 @@
 			<div class=\"rounded_box white\" style=\"margin: 30px auto 0 auto; width: 700px;\">
 				<b class=\"xtop\"><b class=\"xb1\"></b><b class=\"xb2\"></b><b class=\"xb3\"></b><b class=\"xb4\"></b></b>
 				<div class=\"xboxcontent\" style=\"vertical-align: middle; padding: 10px 10px 10px 15px;\">
-				<img style=\"float: left; margin-right: 10px;\" src=\"".\caspar\core\Caspar::getTBGPath()."header.png\"><h1>An error occured in The Bug Genie</h1>";
+				<img style=\"float: left; margin-right: 10px;\" src=\"".\caspar\core\Caspar::getBaseURL()."header.png\"><h1>An error occured in The Bug Genie</h1>";
 				echo "<h2>{$title}</h2>";
 				$report_description = null;
 				if ($exception instanceof \Exception)
@@ -1418,10 +1378,10 @@
 							<br>
 							<form action=\"http://thebuggenie.com/thebuggenie/thebuggenie/issues/new/bugreport\" target=\"_new\" method=\"post\">
 								<label for=\"username\">Username <span>(optional)</span></label>
-								<input type=\"text\" name=\"tbg3_username\" id=\"username\">
+								<input type=\"text\" name=\"csp_username\" id=\"username\">
 								<br style=\"clear: both;\">
 								<label for=\"password\">Password <span>(optional)</span></label>
-								<input type=\"password\" name=\"tbg3_password\" id=\"password\">
+								<input type=\"password\" name=\"csp_password\" id=\"password\">
 								<br>
 								<input type=\"hidden\" name=\"category_id\" value=\"34\">
 								<input type=\"hidden\" name=\"title\" value=\"".htmlentities($title)."\">

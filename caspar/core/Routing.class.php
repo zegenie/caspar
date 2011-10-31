@@ -505,9 +505,9 @@
 			}
 			if (!$relative)
 			{
-				return Caspar::getURLhost() . Caspar::getStrippedTBGPath() . $real_url;
+				return Caspar::getBaseURL() . $real_url;
 			}
-			return Caspar::getStrippedTBGPath() . $real_url;
+			return $real_url;
 		}
 		
 		
