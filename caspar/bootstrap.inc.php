@@ -24,8 +24,8 @@
 	spl_autoload_register(array('\\caspar\\core\\Caspar', 'autoload'));
 
 	// Set up error and exception handling
-	set_error_handler(array('\\caspar\\core\\Caspar', 'errorHandler'));
 	set_exception_handler(array('\\caspar\\core\\Caspar', 'exceptionHandler'));
+	set_error_handler(array('\\caspar\\core\\Caspar', 'errorHandler'));
 	error_reporting(E_ALL | E_NOTICE | E_STRICT);
 
 	// Set core autoloader paths

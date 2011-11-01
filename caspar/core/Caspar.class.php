@@ -1157,29 +1157,37 @@
 		 * @param string $title
 		 * @param \Exception $exception
 		 */
-		public static function exceptionHandler($title, $exception = null)
+		public static function exceptionHandler($exception)
 		{
 			if (self::getRequest() instanceof Request && self::getRequest()->isAjaxCall()) {
-				self::getResponse()->ajaxResponseText(404, $title);
+				self::getResponse()->ajaxResponseText(404, $exception->getMessage());
 			}
 
-			$ob_status = ob_get_status();
-			if (!empty($ob_status) && $ob_status['status'] != PHP_OUTPUT_HANDLER_END) {
-				ob_end_clean();
-			}
+			self::getResponse()->cleanBuffer();
 
 			if (self::isCLI()) {
-				self::cliError($title, $exception);
+				self::cliError($exception->getMessage(), $exception);
 			} else {
 				require CASPAR_PATH . 'templates' . DS . 'error.php';
 			}
 			die();
 		}
 
-		public static function errorHandler($code, $error, $file, $line_number)
+		public static function errorHandler($code, $error, $file, $line)
 		{
-			throw new \Exception($error, $code);
-			//tbg_exception($error, array('code' => $code, 'file' => $file, 'line' => $line_number));
+			if (self::getRequest() instanceof Request && self::getRequest()->isAjaxCall()) {
+				self::getResponse()->ajaxResponseText(404, $error);
+			}
+
+			self::getResponse()->cleanBuffer();
+			$details = compact('code', 'error', 'file', 'line');
+
+			if (self::isCLI()) {
+				self::cliError($error, $details);
+			} else {
+				require CASPAR_PATH . 'templates' . DS . 'error.php';
+			}
+			die();
 		}
 
 		public static function loadConfiguration()
