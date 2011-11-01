@@ -28,6 +28,10 @@
 
 		public function __construct($routes = array())
 		{
+			if (!is_array($routes)) {
+				throw new \RuntimeException('There are no routes configured. Please check your configuration.');
+			}
+
 			foreach ($routes as $route => $details) {
 				$this->addRoute($route, $details);
 			}
