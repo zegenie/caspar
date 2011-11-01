@@ -952,18 +952,12 @@
 			Logging::log('Dispatching');
 			try {
 				if (($route = self::getRouting()->getRouteFromUrl(self::getRequest()->getParameter('url', null, false))) /*|| self::isInstallmode()*/) {
-//					if (self::isUpgrademode()) {
-//						$route = array('module' => 'installation', 'action' => 'upgrade');
-//					} elseif (self::isInstallmode()) {
-//						$route = array('module' => 'installation', 'action' => 'installIntro');
-//					}
 					if (self::$_redirect_login) {
 						Logging::log('An error occurred setting up the user object, redirecting to login', 'main', Logging::LEVEL_NOTICE);
 						self::setMessage('login_message_err', self::geti18n()->__('Please log in'));
 						self::getResponse()->headerRedirect(self::getRouting()->generate('login_page'), 403);
 					}
 					if (self::performAction($route['module'], $route['action'])) {
-						//\b2db\Core::closeConnections();
 						return true;
 					}
 				} else {
