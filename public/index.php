@@ -10,6 +10,11 @@
 	
 	// Include the "engine" script, which initializes and sets up stuff
 	require CASPAR_PATH . 'bootstrap.inc.php';
+
+	// Set runtime environment
+	\caspar\core\Caspar::setEnvironment('prod');
+	\caspar\core\Caspar::setCacheStrategy(array('enabled' => false, 'type' => \caspar\core\Cache::TYPE_APC),
+										array('enabled' => true, 'path' => CASPAR_CACHE_PATH));
 	
-	// Trigger the framework's start function
-	\caspar\core\Caspar::go();
+	// Start loading Caspar
+	caspar\core\Caspar::initialize();

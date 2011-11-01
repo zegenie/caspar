@@ -5,8 +5,15 @@ core:
   modules: ['main']
   language: 'en_US'
   site_name: 'Caspar'
-  css: []
+  stylesheets: []
   javascripts: ['prototype', 'scriptaculous']
   user_classname: \caspar\core\User
   response_classname: \caspar\core\Response
 
+b2db:
+  default:
+	  hostname: ''
+	  username: ''
+	  password: ''
+	  dsn: ''
+	  tableprefix: ''

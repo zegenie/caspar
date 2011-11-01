@@ -21,22 +21,20 @@
 	class Caspar
 	{
 
-		const PREDEFINED_SEARCH_PROJECT_OPEN_ISSUES = 1;
-		const PREDEFINED_SEARCH_PROJECT_CLOSED_ISSUES = 2;
-		const PREDEFINED_SEARCH_PROJECT_MILESTONE_TODO = 6;
-		const PREDEFINED_SEARCH_PROJECT_MOST_VOTED = 7;
-		const PREDEFINED_SEARCH_MY_ASSIGNED_OPEN_ISSUES = 3;
-		const PREDEFINED_SEARCH_TEAM_ASSIGNED_OPEN_ISSUES = 4;
-		const PREDEFINED_SEARCH_MY_REPORTED_ISSUES = 5;
+		const CACHE_KEY_ROUTES_ALL = '_routes';
+		const CACHE_KEY_ROUTES_APPLICATION = '_routes_premodules';
+		const CACHE_KEY_B2DB_CONFIG = '_b2db_config';
+		const CACHE_KEY_PERMISSIONS_CACHE = '_permissions';
+		const CACHE_KEY_SETTINGS = '_settings';
 		
-		static protected $_environment = 2;
+		static protected $_environment;
 
 		static protected $debug_mode = true;
 		
 		static protected $_partials_visited = array();
 
 		static protected $_configuration;
-		
+
 		static protected $_ver_mj;
 		static protected $_ver_mn;
 		static protected $_ver_rev;
@@ -146,23 +144,6 @@
 
 		static protected $_redirect_login;
 		
-		/**
-		 * Do you want to disable minifcation of javascript and css?
-		 * 
-		 * @var boolean
-		 */
-		static protected $_minifyoff = true;
-
-		/**
-		 * Returns whether or minify is disabled
-		 * 
-		 * @return boolean
-		 */
-		public static function isMinifyDisabled()
-		{
-			return self::$_minifyoff;
-		}
-
 		/**
 		 * Add a path to the list of searched paths in the autoloader
 		 * Class files must contain one class with the same name as the class
@@ -288,24 +269,6 @@
 				self::$_routing = new Routing(self::$_configuration['routes']);
 			}
 			return self::$_routing;
-		}
-		
-		/**
-		 * Get when we last loaded the engine
-		 * 
-		 * @return integer
-		 */
-		public static function getLastLoadedAt()
-		{
-			return $_SESSION['b2lastreloadtime'];
-		}
-		
-		/**
-		 * Set when we last loaded the engine
-		 */
-		public static function setLoadedAt()
-		{
-			$_SESSION['b2lastreloadtime'] = NOW;
 		}
 		
 		/**
@@ -451,8 +414,12 @@
 		public static function getResponse()
 		{
 			if (!is_object(self::$_response)) {
-				$classname = self::$_configuration['core']['response_classname'];
-				self::$_response = new $classname(self::$_configuration['core']['javascripts'], self::$_configuration['core']['stylesheets']);
+				if (is_array(self::$_configuration) && array_key_exists('core', self::$_configuration)) {
+					$classname = self::$_configuration['core']['response_classname'];
+					self::$_response = new $classname(self::$_configuration['core']['javascripts'], self::$_configuration['core']['stylesheets']);
+				} else {
+					return new Response();
+				}
 			}
 			return self::$_response;
 		}
@@ -1004,17 +971,14 @@
 				}
 			} catch (TBGTemplateNotFoundException $e) {
 				\b2db\Core::closeDBLink();
-				self::setLoadedAt();
 				header("HTTP/1.0 404 Not Found", true, 404);
 				tbg_exception($e->getMessage() /*'Template file does not exist for current action'*/, $e);
 			} catch (TBGActionNotFoundException $e) {
 				\b2db\Core::closeDBLink();
-				self::setLoadedAt();
 				header("HTTP/1.0 404 Not Found", true, 404);
 				tbg_exception('Module action "' . $route['action'] . '" does not exist for module "' . $route['module'] . '"', $e);
 			} catch (TBGCSRFFailureException $e) {
 				\b2db\Core::closeDBLink();
-				self::setLoadedAt();
 				self::$_response->setHttpStatus(301);
 				$message = $e->getMessage();
 
@@ -1027,7 +991,6 @@
 				echo $message;
 			} catch (Exception $e) {
 				\b2db\Core::closeDBLink();
-				self::setLoadedAt();
 				header("HTTP/1.0 404 Not Found", true, 404);
 				tbg_exception('An error occured', $e);
 			}
@@ -1190,6 +1153,23 @@
 			die();
 		}
 
+		protected static function _loadEnvironmentConfiguration($environment = null)
+		{
+			if ($configuration = Cache::get(self::CACHE_KEY_SETTINGS . $environment)) {
+				Logging::log('Using cached configuration');
+			} elseif ($configuration = Cache::fileGet(self::CACHE_KEY_SETTINGS . $environment)) {
+				Logging::log('Using file cached configuration');
+			} else {
+				Logging::log('Configuration not cached. Retrieving configuration from file');
+				$filename = \CASPAR_APPLICATION_PATH . 'configuration' . \DS . "caspar{$environment}.yml";
+				$configuration = (file_exists($filename)) ? \Spyc::YAMLLoad($filename, true) : array();
+				Cache::add(self::CACHE_KEY_SETTINGS . $environment, $configuration);
+				Cache::fileAdd(self::CACHE_KEY_SETTINGS . $environment, $configuration);
+				Logging::log('Configuration loaded');
+			}
+			return $configuration;
+		}
+
 		public static function loadConfiguration()
 		{
 			Logging::log('Loading Caspar configuration');
@@ -1197,46 +1177,33 @@
 			self::$_ver_mn = 0;
 			self::$_ver_rev = '0-dev';
 			self::$_ver_name = 'Ninja';
-			if (self::$_configuration = Cache::get(Cache::KEY_SETTINGS) || self::$_configuration = Cache::fileGet(Cache::KEY_SETTINGS)) {
-				Logging::log('Using cached configuration');
-			} else {
-				Logging::log('Configuration not cached. Retrieving configuration from file');
-				self::$_configuration = \Spyc::YAMLLoad(\CASPAR_APPLICATION_PATH . 'configuration' . \DS . 'caspar.yml', true);
-				Cache::add(Cache::KEY_SETTINGS, self::$_configuration);
-				Cache::fileAdd(Cache::KEY_SETTINGS, self::$_configuration);
-				Logging::log('Configuration loaded');
-			}
-			if ($b2db_config = Cache::get(Cache::KEY_B2DB_CONFIG) || $b2db_config = Cache::fileGet(Cache::KEY_B2DB_CONFIG)) {
-				Logging::log('Using cached b2db settings');
-			} else {
-				Logging::log('B2DB settings not cached. Retrieving settings from configuration file');
-				$b2db_config_file = \CASPAR_APPLICATION_PATH . 'configuration' . \DS . 'b2db.yml';
-				if (file_exists($b2db_config_file)) {
-					$b2db_config = \Spyc::YAMLLoad($b2db_config_file, true);
-					Cache::add(Cache::KEY_SETTINGS, $b2db_config);
-					Cache::fileAdd(Cache::KEY_SETTINGS, $b2db_config);
-				}
-				Logging::log('Configuration loaded');
-			}
-			self::$_configuration['b2db'] = $b2db_config;
+
+			$configuration = self::_loadEnvironmentConfiguration();
+			$configuration = array_merge_recursive($configuration, self::_loadEnvironmentConfiguration('_'.self::$_environment));
+
+			self::$_configuration = $configuration;
 		}
 		
 		public static function loadRoutes()
 		{
-			if ($routes = Cache::get(Cache::KEY_ROUTES_ALL) || $routes = Cache::fileGet(Cache::KEY_ROUTES_ALL)) {
+			if ($routes = Cache::get(self::CACHE_KEY_ROUTES_ALL)) {
 				Logging::log('Using cached routes');
+			} elseif ($routes = Cache::fileGet(self::CACHE_KEY_ROUTES_ALL)) {
+				Logging::log('Using file cached routes');
 			} else {
 				$routes = array();
-				$files = array(\CASPAR_APPLICATION_PATH . 'configuration' . \DS . 'routes.yml' => Cache::KEY_ROUTES_APPLICATION);
+				$files = array(\CASPAR_APPLICATION_PATH . 'configuration' . \DS . 'routes.yml' => self::CACHE_KEY_ROUTES_APPLICATION);
 				$iterator = new \DirectoryIterator(CASPAR_MODULES_PATH);
 				foreach ($iterator as $fileinfo) {
 					if ($fileinfo->isDir()) {
-						$files[$fileinfo->getPathname() . \DS . 'configuration' . \DS . 'routes.yml'] = Cache::KEY_ROUTES_ALL . '_' . $fileinfo->getBasename();
+						$files[$fileinfo->getPathname() . \DS . 'configuration' . \DS . 'routes.yml'] = self::CACHE_KEY_ROUTES_ALL . '_' . $fileinfo->getBasename();
 					}
 				}
 				foreach ($files as $filename => $cachekey) {
-					if ($route_entries = Cache::get($cachekey) || $route_entries = Cache::fileGet($cachekey)) {
+					if ($route_entries = Cache::get($cachekey)) {
 						Logging::log('Using cached route entry for ' . $filename);
+					} elseif ($route_entries = Cache::fileGet($cachekey)) {
+						Logging::log('Using file cached route entry for ' . $filename);
 					} else {
 						$route_entries = \Spyc::YAMLLoad($filename, true);
 						foreach ($route_entries as $route => $details) {
@@ -1248,7 +1215,7 @@
 						Cache::add($cachekey, $route_entries);
 						Cache::fileAdd($cachekey, $route_entries);
 					}
-					$routes = array_merge($routes, $route_entries);
+					if (is_array($route_entries)) $routes = array_merge($routes, $route_entries);
 				}
 			}
 			self::$_configuration['routes'] = $routes;
@@ -1288,7 +1255,7 @@
 			Logging::log('PHP_VERSION_ID says "' . \PHP_VERSION_ID . '"');
 			Logging::log('PHP_VERSION says "' . \PHP_VERSION . '"');
 
-			Logging::log((Cache::isEnabled()) ? 'APC cache is enabled' : 'APC cache is not enabled');
+			Logging::log((Cache::isInMemorycacheEnabled()) ? 'APC cache is enabled' : 'APC cache is not enabled');
 
 			self::loadConfiguration();
 			
@@ -1298,18 +1265,34 @@
 			
 			Logging::log('Caspar framework loaded');
 			$event = Event::createNew('caspar/core', 'post_initialize')->trigger();
+
+			self::go();
+		}
+
+		public static function setEnvironment($environment)
+		{
+			self::$_environment = $environment;
+		}
+
+		public static function getEnvironment()
+		{
+			return self::$_environment;
+		}
+
+		public static function setCacheStrategy($in_memory = array(), $filecache = array())
+		{
+			$in_memory_enabled = (array_key_exists('enabled', $in_memory) && $in_memory['enabled']);
+			$in_memory_type = ($in_memory_enabled) ? $in_memory['type'] : null;
+			$filecache_enabled = (array_key_exists('enabled', $filecache) && $filecache['enabled']);
+			$filecache_path = ($filecache_enabled) ? $filecache['path'] : null;
+			Cache::setInMemorycacheStrategy($in_memory_enabled, $in_memory_type);
+			Cache::setFilecacheStrategy($filecache_enabled, $filecache_path);
 		}
 
 		public static function isMaintenanceModeEnabled()
 		{
-			$val = false;
-			
-			if (array_key_exists('core', self::$_configuration) && array_key_exists('maintenance_mode', self::$_configuration['core'])) {
-				$val = self::$_configuration['core']['maintenance_mode'];
-			}
-			
-			return $val;
+			return false;
 		}
-		
+
 	}
 	

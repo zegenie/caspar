@@ -37,6 +37,3 @@
 		session_name(CASPAR_SESSION_NAME);
 		session_start();
 	}
-
-	// Start loading Caspar
-	caspar\core\Caspar::initialize();

@@ -21,22 +21,35 @@
 	class Cache
 	{
 
-		const KEY_SCOPES = '_scopes';
-		const KEY_ROUTES_ALL = '_routes';
-		const KEY_ROUTES_APPLICATION = '_routes_premodules';
-		const KEY_B2DB_CONFIG = '_b2db_config';
-		const KEY_PERMISSIONS_CACHE = '_permissions';
-		const KEY_USERSTATES_CACHE = 'TBGUserstate::getAll';
-		const KEY_SETTINGS = '_settings';
-		const KEY_TEXTPARSER_ISSUE_REGEX = '\thebuggenie\core\TextParser::getIssueRegex';
+		const TYPE_APC = 1;
+
+		protected static $_in_memory_enabled;
+		protected static $_in_memory_type;
+		protected static $_filecache_enabled;
+		protected static $_filecache_path;
 		
-		protected static $_enabled = false;
-		protected static $_filecache_enabled = false;
-		protected static $_cache_path;
-		
+		public static function setInMemorycacheStrategy($enabled, $type = null)
+		{
+			self::$_in_memory_enabled = $enabled;
+			if (self::$_in_memory_enabled) {
+				self::$_in_memory_type = $type;
+			}
+		}
+
+		public static function setFilecacheStrategy($enabled, $path = null)
+		{
+			self::$_filecache_enabled = $enabled;
+			if (self::$_filecache_enabled) {
+				if (!file_exists($path)) {
+					throw new \RuntimeException("Configured cache path ({$path}) is not writable. Please check your configuration.");
+				}
+				self::$_filecache_path = $path;
+			}
+		}
+
 		public static function get($key)
 		{
-			if (!self::isEnabled()) return null;
+			if (!self::isInMemorycacheEnabled()) return null;
 			$success = false;
 			$var = apc_fetch($key, $success);
 			return ($success) ? $var : null;
@@ -44,7 +57,7 @@
 
 		public static function has($key)
 		{
-			if (!self::isEnabled()) return false;
+			if (!self::isInMemorycacheEnabled()) return false;
 			$success = false;
 			apc_fetch($key, $success);
 			return $success;
@@ -52,9 +65,8 @@
 		
 		public static function add($key, $value)
 		{
-			if (!self::isEnabled())
-			{
-				Logging::log('Key "' . $key . '" not cached', 'cache');
+			if (!self::isInMemorycacheEnabled()) {
+				Logging::log('Key "' . $key . '" not cached (cache disabled)', 'cache');
 				return false;
 			}
 			apc_store($key, $value);
@@ -64,40 +76,44 @@
 		
 		public static function delete($key)
 		{
-			if (!self::isEnabled()) return null;
+			if (!self::isInMemorycacheEnabled()) return null;
 			apc_delete($key);
 		}
 		
 		public static function fileGet($key)
 		{
-			if (!self::$_filecache_enabled) return null;
-			$filename = self::$_cache_path . $key . '.cache';
+			if (!self::$_filecache_enabled) return false;
+
+			$filename = self::$_filecache_path . $key . '.cache';
 			if (!file_exists($filename)) return null;
-			
+
 			$value = unserialize(file_get_contents($filename));
 			return $value;
 		}
 		
 		public static function fileAdd($key, $value)
 		{
-			if (!self::$_filecache_enabled) return null;
-			$filename = THEBUGGENIE_CORE_PATH . 'cache' . DS . $key . '.cache';
+			if (!self::$_filecache_enabled) return false;
+			$filename = self::$_filecache_path . $key . '.cache';
 			file_put_contents($filename, serialize($value));
 		}
 		
 		public static function fileDelete($key)
 		{
-			if (!self::$_filecache_enabled) return null;
-			$filename = THEBUGGENIE_CORE_PATH . 'cache' . DS . $key . '.cache';
+			if (!self::$_filecache_enabled) return false;
+
+			$filename = self::$_filecache_path . $key . '.cache';
 			unlink($filename);
 		}
-		
-		public static function isEnabled()
+
+		public static function isInMemorycacheEnabled()
 		{
-			if (self::$_enabled)
-			{
-				self::$_enabled = function_exists('apc_add');
-			}
-			return self::$_enabled;
+			return self::$_in_memory_enabled;
 		}
+
+		public static function isFilecacheEnabled()
+		{
+			return self::$_filecache_enabled;
+		}
+
 	}
