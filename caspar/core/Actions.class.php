@@ -102,6 +102,11 @@
 			return Caspar::getResponse();
 		}
 		
+		protected function getRouting()
+		{
+			return Caspar::getRouting();
+		}
+		
 		protected function b2db($config = 'default')
 		{
 			return Caspar::getB2DBInstance($config);
