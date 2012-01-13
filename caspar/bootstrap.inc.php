@@ -4,7 +4,6 @@
 		throw new RuntimeException('You must define the CASPAR_PATH constant so we can find the files we need');
 	}
 
-	error_reporting(E_ALL | E_NOTICE | E_STRICT);
 	date_default_timezone_set('UTC');
 	mb_internal_encoding("UTF-8");
 	mb_language('uni');
