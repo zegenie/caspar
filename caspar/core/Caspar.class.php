@@ -963,15 +963,15 @@
 				} else {
 					self::performAction('main', 'notFound');
 				}
-			} catch (TBGTemplateNotFoundException $e) {
+			} catch (TemplateNotFoundException $e) {
 				\b2db\Core::closeDBLink();
 				header("HTTP/1.0 404 Not Found", true, 404);
-				tbg_exception($e->getMessage() /*'Template file does not exist for current action'*/, $e);
-			} catch (TBGActionNotFoundException $e) {
+				tbg_exception($e->getMessage(), $e);
+			} catch (ActionNotFoundException $e) {
 				\b2db\Core::closeDBLink();
 				header("HTTP/1.0 404 Not Found", true, 404);
 				tbg_exception('Module action "' . $route['action'] . '" does not exist for module "' . $route['module'] . '"', $e);
-			} catch (TBGCSRFFailureException $e) {
+			} catch (CSRFFailureException $e) {
 				\b2db\Core::closeDBLink();
 				self::$_response->setHttpStatus(301);
 				$message = $e->getMessage();
@@ -983,10 +983,10 @@
 
 				self::$_response->renderHeaders();
 				echo $message;
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				\b2db\Core::closeDBLink();
-				header("HTTP/1.0 404 Not Found", true, 404);
-				tbg_exception('An error occured', $e);
+				header("HTTP/1.0 500 Not Found", true, 404);
+				throw $e;
 			}
 		}
 
