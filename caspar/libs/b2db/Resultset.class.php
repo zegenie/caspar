@@ -91,7 +91,7 @@
 		{
 			if ($this->int_ptr == 0)
 			{
-				\TBGLogging::log('This is not a valid row');
+				\caspar\core\Logging::log('This is not a valid row');
 			}
 			if (isset($this->rows[($this->int_ptr - 1)]))
 			{

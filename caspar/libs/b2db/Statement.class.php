@@ -93,7 +93,7 @@
 			try
 			{
 				$values = ($this->getCriteria() instanceof Criteria) ? $this->getCriteria()->getValues() : array();
-				\TBGLogging::log('executing PDO query (' . Core::getSQLCount() . ') - ' . (($this->getCriteria() instanceof Criteria) ? $this->getCriteria()->action : 'unknown'), 'B2DB');
+				\caspar\core\Logging::log('executing PDO query (' . Core::getSQLCount() . ') - ' . (($this->getCriteria() instanceof Criteria) ? $this->getCriteria()->action : 'unknown'), 'B2DB');
 
 				$time = explode(' ', microtime());
 				$pretime = $time[1] + $time[0];
@@ -112,7 +112,7 @@
 				}
 				if (Core::isDebugMode())
 				{
-					\TBGLogging::log('done', 'B2DB');
+					\caspar\core\Logging::log('done', 'B2DB');
 				}
 				if ($this->getCriteria() instanceof Criteria && $this->getCriteria()->action == 'insert')
 				{
@@ -122,9 +122,9 @@
 					}
 					elseif (Core::getDBtype() == 'pgsql')
 					{
-						\TBGLogging::log('sequence: ' . Core::getTablePrefix() . $this->getCriteria()->getTable()->getB2DBName() . '_id_seq', 'b2db');
+						\caspar\core\Logging::log('sequence: ' . Core::getTablePrefix() . $this->getCriteria()->getTable()->getB2DBName() . '_id_seq', 'b2db');
 						$this->insert_id = Core::getDBLink()->lastInsertId(Core::getTablePrefix() . $this->getCriteria()->getTable()->getB2DBName() . '_id_seq');
-						\TBGLogging::log('id is: ' . $this->insert_id, 'b2db');
+						\caspar\core\Logging::log('id is: ' . $this->insert_id, 'b2db');
 					}
 				}
 				$action = ($this->getCriteria() instanceof Criteria) ? $this->getCriteria()->action : '';

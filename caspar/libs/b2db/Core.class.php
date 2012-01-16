@@ -782,8 +782,8 @@
 
 			$key = 'b2db_cache_'.$classname;
 			if (!self::$_debug_mode) {
-				\TBGCache::add($key, self::$_cached_table_classes[$classname]);
-				\TBGCache::fileAdd($key, self::$_cached_table_classes[$classname]);
+				\caspar\core\Cache::add($key, self::$_cached_table_classes[$classname]);
+				\caspar\core\Cache::fileAdd($key, self::$_cached_table_classes[$classname]);
 			}
 		}
 
@@ -869,8 +869,8 @@
 			}
 			$key = 'b2db_cache_'.$classname;
 			if (!self::$_debug_mode) {
-				\TBGCache::add($key, self::$_cached_entity_classes[$classname]);
-				\TBGCache::fileAdd($key, self::$_cached_entity_classes[$classname]);
+				\caspar\core\Cache::add($key, self::$_cached_entity_classes[$classname]);
+				\caspar\core\Cache::fileAdd($key, self::$_cached_entity_classes[$classname]);
 			}
 		}
 
@@ -879,10 +879,10 @@
 			if (!array_key_exists($classname, self::$_cached_entity_classes))
 			{
 				$entity_key = 'b2db_cache_'.$classname;
-				if (\TBGCache::has($entity_key)) {
-					self::$_cached_entity_classes[$classname] = \TBGCache::get($entity_key);
-				} elseif (\TBGCache::fileHas($entity_key)) {
-					self::$_cached_entity_classes[$classname] = \TBGCache::fileGet($entity_key);
+				if (\caspar\core\Cache::has($entity_key)) {
+					self::$_cached_entity_classes[$classname] = \caspar\core\Cache::get($entity_key);
+				} elseif (\caspar\core\Cache::fileHas($entity_key)) {
+					self::$_cached_entity_classes[$classname] = \caspar\core\Cache::fileGet($entity_key);
 				} else {
 					self::cacheEntityClass($classname);
 				}
@@ -894,10 +894,10 @@
 			if (!array_key_exists($classname, self::$_cached_table_classes))
 			{
 				$key = 'b2db_cache_'.$classname;
-				if (\TBGCache::has($key)) {
-					self::$_cached_table_classes[$classname] = \TBGCache::get($key);
-				} elseif (\TBGCache::fileHas($key)) {
-					self::$_cached_table_classes[$classname] = \TBGCache::fileGet($key);
+				if (\caspar\core\Cache::has($key)) {
+					self::$_cached_table_classes[$classname] = \caspar\core\Cache::get($key);
+				} elseif (\caspar\core\Cache::fileHas($key)) {
+					self::$_cached_table_classes[$classname] = \caspar\core\Cache::fileGet($key);
 				} else {
 					self::cacheTableClass($classname);
 				}
