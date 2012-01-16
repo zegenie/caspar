@@ -93,16 +93,18 @@
 		 *
 		 * @param boolean $load_parameters[optional] whether to load connection parameters
 		 */
-		public static function initialize($bootstrap_location = null)
+		public static function initialize($configuration = array())
 		{
-			if (!defined('B2DB_BASEPATH'))
-				throw new Exception('The constant B2DB_BASEPATH must be defined. B2DB_BASEPATH should be the full system path to B2DB');
-			
 			try
 			{
-				if ($bootstrap_location !== null && \file_exists($bootstrap_location))
-					require $bootstrap_location;
-				
+				if (array_key_exists('dsn', $configuration) && $configuration['dsn']) self::setDSN($configuration['dsn']);
+				if (array_key_exists('driver', $configuration) && $configuration['driver']) self::setDBtype($configuration['driver']);
+				if (array_key_exists('hostname', $configuration) && $configuration['hostname']) self::setHost($configuration['hostname']);
+				if (array_key_exists('port', $configuration) && $configuration['port']) self::setPort($configuration['port']);
+				if (array_key_exists('username', $configuration) && $configuration['username']) self::setUname($configuration['username']);
+				if (array_key_exists('password', $configuration) && $configuration['password']) self::setPasswd($configuration['password']);
+				if (array_key_exists('database', $configuration) && $configuration['database']) self::setDBname($configuration['database']);
+				if (array_key_exists('tableprefix', $configuration) && $configuration['tableprefix']) self::setTablePrefix($configuration['tableprefix']);
 			}
 			catch (\Exception $e)
 			{
@@ -241,6 +243,9 @@
 		 */
 		public static function getDBlink()
 		{
+			if (!self::$_db_connection instanceof \PDO) {
+				self::doConnect();
+			}
 			return self::$_db_connection;
 		}
 
@@ -506,7 +511,8 @@
 				{
 					self::$_db_connection = null;
 				}
-				self::$_db_connection = new \PDO(self::getDSN(), $uname, $pwd);
+				$dsn = self::getDSN();
+				self::$_db_connection = new \PDO($dsn, $uname, $pwd);
 				if (!self::$_db_connection instanceof \PDO)
 				{
 					throw new Exception('Could not connect to the database, but not caught by PDO');
@@ -515,7 +521,7 @@
 			}
 			catch (\PDOException $e)
 			{
-				throw new Exception($e->getMessage());
+				throw new Exception("COuld not connect to the database [".$e->getMessage()."], dsn: {$dsn}");
 			}
 			catch (Exception $e)
 			{
