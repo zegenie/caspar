@@ -80,6 +80,14 @@
 			apc_delete($key);
 		}
 		
+		public static function fileHas($key)
+		{
+			if (!self::$_filecache_enabled) return false;
+
+			$filename = self::$_filecache_path . $key . '.cache';
+			return file_exists($filename);
+		}
+		
 		public static function fileGet($key)
 		{
 			if (!self::$_filecache_enabled) return false;
@@ -90,7 +98,7 @@
 			$value = unserialize(file_get_contents($filename));
 			return $value;
 		}
-		
+
 		public static function fileAdd($key, $value)
 		{
 			if (!self::$_filecache_enabled) return false;
