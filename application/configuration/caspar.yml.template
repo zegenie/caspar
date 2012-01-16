@@ -1,0 +1,24 @@
+# Caspar configuration
+
+core:
+  url: "http://caspar.l/"
+  modules: ['main', 'b2db']
+  language: 'en_US'
+  site_name: 'Caspar sample application'
+  stylesheets: []
+  javascripts: ['prototype', 'scriptaculous']
+  user_classname: \caspar\core\User
+  response_classname: \caspar\core\Response
+
+services:
+  b2db:
+    auto_initialize: true
+    callback: [\b2db\Core, 'initialize']
+    arguments:
+      driver: 'mysql'         # pdo driver to use
+      hostname: 'localhost'   # the database hostname
+      username: 'username'    # username used for db connection
+      password: 'password'    # password used for db connection
+      database: 'caspar_test' # the name of the database to connect to
+#     dsn: ''                 # alternatively use a DSN instead of parameters above
+#     tableprefix: ''         # the table prefix (if used) for all tables (for shared databases)
