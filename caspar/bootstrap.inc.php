@@ -13,6 +13,7 @@
 	defined('CASPAR_CORE_PATH') || define('CASPAR_CORE_PATH', CASPAR_PATH . 'core' . DS);
 	defined('CASPAR_LIB_PATH') || define('CASPAR_LIB_PATH', CASPAR_PATH . 'libs' . DS);
 	defined('CASPAR_MODULES_PATH') || define('CASPAR_MODULES_PATH', CASPAR_APPLICATION_PATH . 'modules' . DS);
+	defined('CASPAR_ENTITIES_PATH') || define('CASPAR_ENTITIES_PATH', CASPAR_APPLICATION_PATH . 'entities' . DS);
 	defined('CASPAR_CACHE_PATH') || define('CASPAR_CACHE_PATH', CASPAR_APPLICATION_PATH . 'cache' . DS);
 	defined('CASPAR_SESSION_NAME') || defined('CASPAR_SESSION_NAME') || define('CASPAR_SESSION_NAME', 'CASPAR_SESSION');
 
@@ -30,6 +31,7 @@
 	// Set core autoloader paths
 	caspar\core\Caspar::autoloadNamespace('caspar\\core', CASPAR_CORE_PATH);
 	caspar\core\Caspar::autoloadNamespace('application\\modules', CASPAR_MODULES_PATH);
+	caspar\core\Caspar::autoloadNamespace('application\\entities', CASPAR_ENTITIES_PATH);
 	caspar\core\Caspar::addAutoloaderClassPath(CASPAR_LIB_PATH);
 
 	if (!isset($argc) && !ini_get('session.auto_start')) {
