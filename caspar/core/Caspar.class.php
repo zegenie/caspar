@@ -28,7 +28,7 @@ class Caspar
 	const CACHE_KEY_SETTINGS = '_settings';
 
 	static protected $_environment;
-	static protected $debug_mode = true;
+	static protected $_debug_mode = true;
 	static protected $_partials_visited = array();
 	static protected $_configuration;
 	static protected $_serviceconfigurations;
@@ -599,7 +599,7 @@ class Caspar
 
 	public static function visitPartial($template_name, $time)
 	{
-		if (!self::$debug_mode)
+		if (!self::$_debug_mode)
 			return;
 		if (!array_key_exists($template_name, self::$_partials_visited)) {
 			self::$_partials_visited[$template_name] = array('time' => $time, 'count' => 1);
@@ -650,7 +650,7 @@ class Caspar
 			if (self::getRouting()->isCurrentRouteCSRFenabled())
 				self::checkCSRFtoken(true);
 
-			if (self::$debug_mode) {
+			if (self::$_debug_mode) {
 				$time = explode(' ', microtime());
 				$pretime = $time[1] + $time[0];
 			}
@@ -661,7 +661,7 @@ class Caspar
 				if ($pre_action_retval = $actionObject->preExecute(self::getRequest(), $method)) {
 					$content = ob_get_clean();
 					Logging::log('preexecute method returned something, skipping further action');
-					if (self::$debug_mode)
+					if (self::$_debug_mode)
 						$visited_templatename = "{$actionClassName}::preExecute()";
 				}
 			}
@@ -678,12 +678,12 @@ class Caspar
 
 					// Running main route action
 					Logging::log('Running route action ' . $actionToRunName . '()');
-					if (self::$debug_mode) {
+					if (self::$_debug_mode) {
 						$time = explode(' ', microtime());
 						$action_pretime = $time[1] + $time[0];
 					}
 					$action_retval = $actionObject->$actionToRunName(self::getRequest());
-					if (self::$debug_mode) {
+					if (self::$_debug_mode) {
 						$time = explode(' ', microtime());
 						$action_posttime = $time[1] + $time[0];
 						self::visitPartial("{$actionClassName}::{$actionToRunName}", $action_posttime - $action_pretime);
@@ -724,7 +724,7 @@ class Caspar
 					$content = ob_get_clean();
 					Logging::log('...completed');
 				}
-			} elseif (self::$debug_mode) {
+			} elseif (self::$_debug_mode) {
 				$time = explode(' ', microtime());
 				$posttime = $time[1] + $time[0];
 				self::visitPartial($visited_templatename, $posttime - $pretime);
@@ -846,7 +846,8 @@ class Caspar
 			tbg_exception($e->getMessage(), $e);
 		} catch (ActionNotFoundException $e) {
 			header("HTTP/1.0 404 Not Found", true, 404);
-			tbg_exception('Module action "' . $route['action'] . '" does not exist for module "' . $route['module'] . '"', $e);
+                        throw $e;
+			//('Module action "' . $route['action'] . '" does not exist for module "' . $route['module'] . '"', $e);
 		} catch (CSRFFailureException $e) {
 			self::$_response->setHttpStatus(301);
 			$message = $e->getMessage();
@@ -877,7 +878,7 @@ class Caspar
 
 	public static function isDebugMode()
 	{
-		return self::$debug_mode;
+		return self::$_debug_mode;
 	}
 
 	protected static function cliError($title, $exception)
@@ -1025,13 +1026,14 @@ class Caspar
 		$configuration = array_merge_recursive($configuration, self::_loadEnvironmentConfiguration('_' . self::$_environment));
 
 		self::$_configuration = array('core' => $configuration['core']);
+
 		if (self::$_configuration['core']['debug']) {
-			self::$debug_mode = true;
+			self::$_debug_mode = true;
 			self::autoloadNamespace('al13_debug', \CASPAR_LIB_PATH . DS . 'al13_debug' . DS);
 			require \CASPAR_LIB_PATH . 'al13_debug' . DS . 'bootstrap.php';
 			self::getResponse()->addStylesheet('css/debugger.css');
 		} else {
-			self::$debug_mode = false;
+			self::$_debug_mode = false;
 		}
 		unset($configuration['core']);
 		self::$_serviceconfigurations = $configuration['services'];
