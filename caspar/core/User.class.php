@@ -24,6 +24,8 @@
 		/**
 		 * Unique identifier
 		 *
+		 * @Id
+		 * @Column(type="integer", auto_increment=true, length=10)
 		 * @var integer
 		 */
 		protected $_id;
@@ -31,6 +33,7 @@
 		/**
 		 * Unique username (login name)
 		 *
+		 * @Column(type="string", length=200)
 		 * @var string
 		 */
 		protected $_username = '';
@@ -45,6 +48,7 @@
 		/**
 		 * Hashed password
 		 *
+		 * @Column(type="string", length=200)
 		 * @var string
 		 */
 		protected $_password = '';
@@ -52,6 +56,7 @@
 		/**
 		 * User real name
 		 *
+		 * @Column(type="string", length=200)
 		 * @var string
 		 */
 		protected $_realname = '';
@@ -59,6 +64,7 @@
 		/**
 		 * User email
 		 *
+		 * @Column(type="string", length=250)
 		 * @var string
 		 */
 		protected $_email = '';
@@ -71,16 +77,16 @@
 		protected $_language = '';
 		
 		/**
-		 * The users group 
-		 * 
-		 * @var \thebuggenie\entities\Group
-		 * @Class \thebuggenie\entities\Group
+		 * The users group
+		 *
+		 * @Column(type="integer", length=10)
 		 */
 		protected $_group_id = null;
 	
 		/**
 		 * Timestamp of when the user was last seen
 		 *
+		 * @Column(type="integer", length=10)
 		 * @var integer
 		 */
 		protected $_lastseen = 0;
@@ -95,6 +101,7 @@
 		/**
 		 * Whether the user is enabled
 		 * 
+		 * @Column(type="boolean", deafult=true)
 		 * @var boolean
 		 */
 		protected $_enabled = false;
@@ -102,6 +109,7 @@
 		/**
 		 * Whether the user is activated
 		 * 
+		 * @Column(type="boolean", deafult=false)
 		 * @var boolean
 		 */
 		protected $_activated = false;
@@ -109,6 +117,7 @@
 		/**
 		 * Whether the user is deleted
 		 * 
+		 * @Column(type="boolean", deafult=false)
 		 * @var boolean
 		 */
 		protected $_deleted = false;
@@ -122,7 +131,7 @@
 		 */
 		public static function hashPassword($password, $salt = null)
 		{
-			$salt = ($salt !== null) ? $salt : TBGSettings::getPasswordSalt();
+			$salt = ($salt !== null) ? $salt : Caspar::getSalt();
 			return crypt($password, '$2a$07$'.$salt.'$');
 		}
 		
