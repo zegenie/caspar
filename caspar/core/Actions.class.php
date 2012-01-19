@@ -106,6 +106,11 @@
 		{
 			return Caspar::getRouting();
 		}
+
+		protected function getUser()
+		{
+			return Caspar::getUser();
+		}
 		
 		protected function b2db($config = 'default')
 		{
@@ -152,18 +157,9 @@
 			if (!$condition)
 			{
 				$message = ($message === null) ? Caspar::getI18n()->__("You are not allowed to access to this page") : $message;
-				if (Caspar::getUser()->isGuest())
-				{
-					Caspar::setMessage('login_message_err', $message);
-					Caspar::setMessage('login_force_redirect', true);
-					Caspar::setMessage('login_referer', Caspar::getRouting()->generate(Caspar::getRouting()->getCurrentRouteName()));
-					$this->forward(Caspar::getRouting()->generate('login_page'), 403);
-				}
-				else
-				{
-					$this->getResponse()->setHttpStatus(403);
-					$this->getResponse()->setTemplate('main/forbidden', array('message' => $message));
-				}
+				$this->getResponse()->setHttpStatus(403);
+				$this->message = $message;
+				$this->getResponse()->setTemplate('main/forbidden');
 			}
 		}
 		
