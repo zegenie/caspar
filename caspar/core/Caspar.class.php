@@ -328,25 +328,19 @@ class Caspar
 	{
 		Logging::log('Loading user');
 		try {
-			Logging::log('is this logout?');
-			if (self::getRequest()->getParameter('logout')) {
-				Logging::log('yes');
-				self::logout();
-			} else {
-				Logging::log('no');
-				Logging::log('sets up user object');
-				$event = Event::createNew('core', 'pre_login');
-				$event->trigger();
+			Logging::log('no');
+			Logging::log('sets up user object');
+			$event = Event::createNew('core', 'pre_login');
+			$event->trigger();
 
-				if ($event->isProcessed())
-					self::loadUser($event->getReturnValue());
-				else
-					self::loadUser();
+			if ($event->isProcessed())
+				self::loadUser($event->getReturnValue());
+			else
+				self::loadUser();
 
-				Event::createNew('core', 'post_login', self::getUser())->trigger();
+			Event::createNew('core', 'post_login', self::getUser())->trigger();
 
-				Logging::log('loaded');
-			}
+			Logging::log('loaded');
 		} catch (Exception $e) {
 			Logging::log("Something happened while setting up user: " . $e->getMessage(), 'main', Logging::LEVEL_WARNING);
 			if (!self::isCLI() && (self::getRouting()->getCurrentRouteModule() != 'main' || self::getRouting()->getCurrentRouteAction() != 'register1' && self::getRouting()->getCurrentRouteAction() != 'register2' && self::getRouting()->getCurrentRouteAction() != 'activate' && self::getRouting()->getCurrentRouteAction() != 'reset_password' && self::getRouting()->getCurrentRouteAction() != 'captcha' && self::getRouting()->getCurrentRouteAction() != 'login' && self::getRouting()->getCurrentRouteAction() != 'getBackdropPartial' && self::getRouting()->getCurrentRouteAction() != 'serve' && self::getRouting()->getCurrentRouteAction() != 'doLogin'))
@@ -425,12 +419,11 @@ class Caspar
 	{
 		try {
 			$classname = self::$_configuration['core']['user_classname'];
-			self::$_user = ($user === null) ? $classname::loginCheck(self::getRequest()->getParameter('csp_username'), self::getRequest()->getParameter('csp_password')) : $user;
+			$request = self::getRequest();
+			self::$_user = ($user === null) ? $classname::loginCheck($request->getParameter('csp_username', $request->getCookie('csp_username')), $request->getParameter('csp_password', $request->getCookie('csp_password'))) : $user;
 			if (self::$_user->isAuthenticated()) {
-				if (self::$_user->isOffline() || self::$_user->isAway()) {
-					self::$_user->setOnline();
-				}
-				self::$_user->updateLastSeen();
+				self::getResponse()->setCookie('csp_username', self::$_user->getUsername());
+				self::getResponse()->setCookie('csp_password', self::$_user->getPassword());
 				Event::createNew('core', 'post_loaduser', self::$_user)->trigger();
 			}
 		} catch (Exception $e) {
@@ -457,7 +450,7 @@ class Caspar
 	 * 
 	 * @param User $user
 	 */
-	public static function setUser(User $user)
+	public static function setUser($user)
 	{
 		self::$_user = $user;
 	}
@@ -470,7 +463,7 @@ class Caspar
 		Event::createNew('caspar', 'caspar\pre_logout')->trigger();
 		self::getResponse()->deleteCookie('csp_username');
 		self::getResponse()->deleteCookie('csp_password');
-		self::getResponse()->deleteCookie('THEBUGGENIE');
+		self::getResponse()->deleteCookie(CASPAR_SESSION_NAME);
 		session_regenerate_id(true);
 		Event::createNew('caspar', 'caspar\post_logout')->trigger();
 	}
@@ -1179,6 +1172,11 @@ class Caspar
 	public static function isMaintenanceModeEnabled()
 	{
 		return false;
+	}
+
+	public static function getSalt()
+	{
+		return self::$_configuration['core']['salt'];
 	}
 
 }
