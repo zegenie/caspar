@@ -87,7 +87,7 @@
 		public function renderJSON($text = array())
 		{
 			$this->getResponse()->setContentType('application/json');
-			$this->getResponse()->setDecoration(TBGResponse::DECORATE_NONE);
+			$this->getResponse()->setDecoration(Response::DECORATE_NONE);
 			echo json_encode($text);
 			return true;
 		}
@@ -208,7 +208,7 @@
 		{
 			$current_content = ob_get_clean();
 			ob_start('mb_output_handler');
-			echo \caspar\core\ActionComponents::includeComponent($template, $params);
+			echo \caspar\core\Components::includeComponent($template, $params);
 			$component_content = ob_get_clean();
 			ob_start('mb_output_handler');
 			echo $current_content;
@@ -240,7 +240,7 @@
 		{
 			$current_content = ob_get_clean();
 			ob_start('mb_output_handler');
-			echo \caspar\core\ActionComponents::includeTemplate($template, $params);
+			echo \caspar\core\Components::includeTemplate($template, $params);
 			$template_content = ob_get_clean();
 			ob_start('mb_output_handler');
 			echo $current_content;

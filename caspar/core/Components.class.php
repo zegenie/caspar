@@ -69,7 +69,7 @@
 		protected static function _getComponentDetails($template)
 		{
 			$module_file = self::getModuleAndTemplate($template);
-			$actionClassName = '\\application\\modules\\'.$module_file['module'].'\\ActionComponents';
+			$actionClassName = '\\application\\modules\\'.$module_file['module'].'\\Components';
 			$actionToRunName = 'component' . ucfirst($module_file['file']);
 
 			return array($module_file, $actionClassName, $actionToRunName);
@@ -85,13 +85,13 @@
 			if (!class_exists($actionClassName))
 			{
 				if (!$throw_exceptions) return false;
-				throw new TBGComponentNotFoundException('The component class ' . $actionClassName . ' could not be found');
+				throw new ComponentNotFoundException('The component class ' . $actionClassName . ' could not be found');
 			}
 			$actionClass = new $actionClassName();
 			if (!method_exists($actionClass, $actionToRunName))
 			{
 				if (!$throw_exceptions) return false;
-				throw new TBGComponentNotFoundException("The component action {$actionToRunName} was not found in the {$actionClassName} class");
+				throw new ComponentNotFoundException("The component action {$actionToRunName} was not found in the {$actionClassName} class");
 			}
 			$retval = self::_doesTemplateExist($template, $throw_exceptions, $module_file);
 			if (!$throw_exceptions) return $retval;
@@ -204,11 +204,31 @@
 		/**
 		 * Returns the response object
 		 *
-		 * @return TBGResponse
+		 * @return Response
 		 */
 		protected function getResponse()
 		{
 			return Caspar::getResponse();
 		}
+
+		/**
+		 * Returns the request object
+		 *
+		 * @return Request
+		 */
+		protected function getRequest()
+		{
+			return Caspar::getRequest();
+		}
 		
-	}
+		/**
+		 * Returns the user object
+		 *
+		 * @return User
+		 */
+		protected function getUser()
+		{
+			return Caspar::getUser();
+		}
+
+}
