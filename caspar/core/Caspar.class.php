@@ -706,7 +706,7 @@ class Caspar
 						// different module, specified by "module/templatename"
 						if (mb_strpos(self::getResponse()->getTemplate(), '/')) {
 							$newPath = explode('/', self::getResponse()->getTemplate());
-							$templateName = THEBUGGENIE_MODULES_PATH . $newPath[0] . DS . 'templates' . DS . $newPath[1] . '.' . self::getRequest()->getRequestedFormat() . '.php';
+							$templateName = CASPAR_MODULES_PATH . $newPath[0] . DS . 'templates' . DS . $newPath[1] . '.' . self::getRequest()->getRequestedFormat() . '.php';
 						} else {
 							$templateName = $template_path . self::getResponse()->getTemplate();
 						}
