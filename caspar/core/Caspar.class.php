@@ -1025,6 +1025,14 @@ class Caspar
 		$configuration = array_merge_recursive($configuration, self::_loadEnvironmentConfiguration('_' . self::$_environment));
 
 		self::$_configuration = array('core' => $configuration['core']);
+		if (self::$_configuration['core']['debug']) {
+			self::$debug_mode = true;
+			self::autoloadNamespace('al13_debug', \CASPAR_LIB_PATH . DS . 'al13_debug' . DS);
+			require \CASPAR_LIB_PATH . 'al13_debug' . DS . 'bootstrap.php';
+			self::getResponse()->addStylesheet('css/debugger.css');
+		} else {
+			self::$debug_mode = false;
+		}
 		unset($configuration['core']);
 		self::$_serviceconfigurations = $configuration['services'];
 	}
