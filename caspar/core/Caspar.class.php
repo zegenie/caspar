@@ -836,10 +836,10 @@ class Caspar
 			}
 		} catch (TemplateNotFoundException $e) {
 			header("HTTP/1.0 404 Not Found", true, 404);
-			tbg_exception($e->getMessage(), $e);
+			throw $e;
 		} catch (ActionNotFoundException $e) {
 			header("HTTP/1.0 404 Not Found", true, 404);
-                        throw $e;
+			throw $e;
 			//('Module action "' . $route['action'] . '" does not exist for module "' . $route['module'] . '"', $e);
 		} catch (CSRFFailureException $e) {
 			self::$_response->setHttpStatus(301);

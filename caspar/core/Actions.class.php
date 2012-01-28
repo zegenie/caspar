@@ -61,7 +61,7 @@
 			{
 				return $this->$actionName(Caspar::getRequest());
 			}
-			throw new Exception("The action \"{$actionName}\" does not exist in ".get_class($this));
+			throw new \Exception("The action \"{$actionName}\" does not exist in ".get_class($this));
 		}
 		
 		/**
