@@ -1029,17 +1029,25 @@ class Caspar
 			self::$_debug_mode = false;
 		}
 		unset($configuration['core']);
-		self::$_serviceconfigurations = $configuration['services'];
+		if (array_key_exists('services', $configuration)) {
+			self::$_serviceconfigurations = $configuration['services'];
+		} else {
+			self::$_serviceconfigurations = array();
+		}
 	}
 
 	protected static function initializeServices()
 	{
-		foreach (self::$_serviceconfigurations as $service => $configuration) {
-			if (array_key_exists('auto_initialize', $configuration) && $configuration['auto_initialize'] == true) {
-				if (array_key_exists('callback', $configuration)) {
-					$callback = $configuration['callback'];
-					$arguments = array_key_exists('arguments', $configuration) ? $configuration['arguments'] : array();
-					call_user_func($callback, $arguments);
+		if (!is_array(self::$_serviceconfigurations)) {
+			self::$_serviceconfigurations = array();
+		} else {
+			foreach (self::$_serviceconfigurations as $service => $configuration) {
+				if (array_key_exists('auto_initialize', $configuration) && $configuration['auto_initialize'] == true) {
+					if (array_key_exists('callback', $configuration)) {
+						$callback = $configuration['callback'];
+						$arguments = array_key_exists('arguments', $configuration) ? $configuration['arguments'] : array();
+						call_user_func($callback, $arguments);
+					}
 				}
 			}
 		}
