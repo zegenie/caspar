@@ -75,7 +75,7 @@ body { background-color: #DFDFDF; font-family: sans-serif; font-size: 13px; }
 						<li>
 						<?php if (array_key_exists('class', $trace_element)): ?>
 							<strong><?php echo $trace_element['class'].$trace_element['type'].$trace_element['function']; ?>()</strong>
-						<?php elseif (array_key_exists('function', $trace_element) && !in_array($trace_element['function'], array('tbg_error_handler', 'tbg_exception'))): ?>
+						<?php elseif (array_key_exists('function', $trace_element) && $trace_element['class'] != 'caspar\core\Caspar' && !in_array($trace_element['function'], array('errorHandler', 'exceptionHandler'))): ?>
 							<strong><?php echo $trace_element['function']; ?>()</strong>
 						<?php else: ?>
 							<strong>unknown function</strong>
