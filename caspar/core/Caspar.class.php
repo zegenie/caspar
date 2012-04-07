@@ -201,7 +201,6 @@ class Caspar
 					$classpath = (count($orig_class_details)) ? join(DS, $orig_class_details) . DS : '';
 					$basepath = $namespaces[$namespace];
 					$filename = $basepath . DS . $classpath . $classname_element . '.class.php';
-					$filename_alternate = $basepath . DS . $classpath . "classes" . DS . $classname_element . ".class.php";
 					break;
 				}
 				array_pop($class_details);
@@ -222,6 +221,7 @@ class Caspar
 			require $filename_alternate;
 			return;
 		}
+
 	}
 
 	/**
@@ -232,20 +232,6 @@ class Caspar
 	public static function getClasspaths()
 	{
 		return self::$_classpaths;
-	}
-
-	/**
-	 * Setup the routing object with CLI parameters
-	 *
-	 * @param string $module
-	 * @param string $action
-	 */
-	public static function setCLIRouting($module, $action)
-	{
-		self::$_routing->setCurrentRouteModule($module);
-		self::$_routing->setCurrentRouteAction($action);
-		self::$_routing->setCurrentRouteName('cli');
-		self::$_routing->setCurrentRouteCSRFenabled(false);
 	}
 
 	/**
@@ -959,15 +945,15 @@ class Caspar
 	 */
 	public static function exceptionHandler($exception)
 	{
-		if (self::getRequest() instanceof Request && self::getRequest()->isAjaxCall()) {
-			self::getResponse()->ajaxResponseText(404, $exception->getMessage());
-		}
-
-		self::getResponse()->cleanBuffer();
-
 		if (self::isCLI()) {
 			self::cliError($exception->getMessage(), $exception);
 		} else {
+			if (self::getRequest() instanceof Request && self::getRequest()->isAjaxCall()) {
+				self::getResponse()->ajaxResponseText(404, $exception->getMessage());
+			}
+	
+			self::getResponse()->cleanBuffer();
+
 			require CASPAR_PATH . 'templates' . DS . 'error.php';
 		}
 		die();

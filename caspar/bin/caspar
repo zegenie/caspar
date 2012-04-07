@@ -1,120 +1,112 @@
 #!/usr/bin/php
 <?php
-	// Define The Bug Genie paths and related constants
-	define('TBG_CLI', true);
+	// Define Caspar paths and related constants
+	define('CSP_CLI', true);
 
+	// This code requires PHP 5.3 or newer, so if we don't have it - complain
+	if (PHP_VERSION_ID < 50300) die('This software requires PHP 5.3.0 or newer, but you have an older version. Please upgrade');
+
+	// Set standard constants needed elsewhere
 	defined('DS') || define('DS', DIRECTORY_SEPARATOR);
-	defined('THEBUGGENIE_PATH') || define ('THEBUGGENIE_PATH', dirname(realpath(__FILE__)) . DS);
-	defined('THEBUGGENIE_CORE_PATH') || define('THEBUGGENIE_CORE_PATH', THEBUGGENIE_PATH . 'core' . DS);
-
-	if( !defined('THEBUGGENIE_CONFIG_PATH'))
-	{
-		if(file_exists(getenv('HOME') . DS . '.remote_server'))
-			define('THEBUGGENIE_CONFIG_PATH', getenv('HOME') . DS);
-		else
-			define('THEBUGGENIE_CONFIG_PATH', THEBUGGENIE_PATH);
-	}
-
-	defined('THEBUGGENIE_MODULES_PATH') || define('THEBUGGENIE_MODULES_PATH', THEBUGGENIE_PATH . 'modules' . DS);
-	defined('THEBUGGENIE_PUBLIC_FOLDER_NAME') || define('THEBUGGENIE_PUBLIC_FOLDER_NAME', '');
+	defined('CASPAR_PATH') || define('CASPAR_PATH', realpath(getcwd() . DS) . DS . 'caspar' . DS);
 
 	try
 	{
 		// Include the "engine" script, which initializes and sets up stuff
-		require THEBUGGENIE_PATH . 'core/tbg_engine.inc.php';
+		require CASPAR_PATH . 'bootstrap.inc.php';
 	}
 	catch (Exception $e)
 	{
-		TBGCliCommand::cli_echo("An error occured when trying to initialize the command line client:\n", 'white', 'bold');
-		TBGCliCommand::cli_echo($e->getMessage() . "\n", 'red', 'bold');
+		caspar\core\CliCommand::cli_echo("An error occured when trying to initialize the command line client:\n", 'white', 'bold');
+		caspar\core\CliCommand::cli_echo($e->getMessage() . "\n", 'red', 'bold');
 		die();
 	}
 
 	// Set up all available search paths for cli commands
 	$command_paths = array();
-	$command_paths['main'] = THEBUGGENIE_PATH . 'modules' . DS . 'main' . DS . 'classes' . DS . 'cli' . DS;
-	$command_paths['remote'] = THEBUGGENIE_PATH . 'modules' . DS . 'remote' . DS . 'classes' . DS . 'cli' . DS;
-	foreach (TBGContext::getModules() as $module_name => $module)
+	$command_paths['caspar'] = CASPAR_CORE_PATH . 'cli' . DS;
+
+	$iterator = new \DirectoryIterator(CASPAR_MODULES_PATH);
+	foreach ($iterator as $fileinfo)
 	{
-		$module_cli_path = THEBUGGENIE_PATH . 'modules' . DS . $module_name . DS . 'classes' . DS . 'cli' . DS;
-		if (file_exists($module_cli_path))
+		if ($fileinfo->isDir())
 		{
-			$command_paths[$module_name] = $module_cli_path;
+			if (file_exists($fileinfo->getPathname() . DS . 'cli'))
+			{
+				$command_paths[$fileinfo->getFilename()] = $fileinfo->getPathname() . DS . 'cli';
+			}
 		}
 	}
 
 	// Set up all cli commands
-	$commands = array('main' => array());
-	foreach ($command_paths as $module_name => $command_path)
+	foreach ($command_paths as $namespace_name => $command_path)
 	{
-		TBGContext::addAutoloaderClasspath($command_path);
+		caspar\core\Caspar::autoloadNamespace($namespace_name.'\\cli', $command_path);
 		$_path_handle = opendir($command_path);
 		while ($command_class_file = readdir($_path_handle))
 		{
 			if (($classname = substr($command_class_file, 0, strpos($command_class_file, '.'))) != '')
 			{
-				$module = (TBGContext::isModuleLoaded($module_name)) ? TBGContext::getModule($module_name) : null;
-				$command = new $classname($module);
-				if ($command instanceof TBGCliCommand)
+				$finalname = $namespace_name.'\\cli\\'.$classname;
+
+				$command = new $finalname($namespace_name);
+				if ($command instanceof caspar\core\CliCommand)
 				{
-					$commands[$module_name][$command->getCommandName()] = $command;
+					$commands[$namespace_name][$command->getCommandName()] = $command;
 					foreach ($command->getCommandAliases() as $alias)
 					{
-						$commands[$module_name][$alias] = $command;
+						$commands[$namespace_name][$alias] = $command;
 					}
 				}
 			}
 		}
 	}
-	TBGCliCommand::setAvailableCommands($commands);
+	caspar\core\CliCommand::setAvailableCommands($commands);
 
 	if ($argc < 2)
 	{
 		// Show usage if no parameters are provided
-		TBGCliCommand::cli_echo("The Bug Genie command line tool\n\n");
-		TBGCliCommand::cli_echo("Usage: ", 'white', 'bold');
-		TBGCliCommand::cli_echo(TBGCliCommand::getCommandLineName() . " [");
-		TBGCliCommand::cli_echo('command', 'green', 'bold');
-		TBGCliCommand::cli_echo("]\n");
-		TBGCliCommand::cli_echo("Type " . TBGCliCommand::getCommandLineName() . ' ');
-		TBGCliCommand::cli_echo('help', 'green', 'bold');
-		TBGCliCommand::cli_echo(" for more information.\n\n");
+		caspar\core\CliCommand::cli_echo("Caspar command line tool\n\n");
+		caspar\core\CliCommand::cli_echo("Usage: ", 'white', 'bold');
+		caspar\core\CliCommand::cli_echo(caspar\core\CliCommand::getCommandLineName() . " [");
+		caspar\core\CliCommand::cli_echo('command', 'green', 'bold');
+		caspar\core\CliCommand::cli_echo("]\n");
+		caspar\core\CliCommand::cli_echo("Type " . caspar\core\CliCommand::getCommandLineName() . ' ');
+		caspar\core\CliCommand::cli_echo('help', 'green', 'bold');
+		caspar\core\CliCommand::cli_echo(" for more information.\n\n");
 	}
 	else
 	{
 		// Process arguments and invoke command if available
 		try
 		{
-			TBGCliCommand::processArguments();
-			$module_command = explode(':', $argv[1]);
-			$module_name = (count($module_command) == 2) ? $module_command[0] : 'main';
-			$command = (count($module_command) == 2) ? $module_command[1] : $module_command[0];
+			caspar\core\CliCommand::processArguments();
+			$namespace_command = explode(":", $argv[1]);
+			$namespace_name = (count($namespace_command) == 2) ? $namespace_command[0] : 'caspar';
+			$command = (count($namespace_command) == 2) ? $namespace_command[1] : $namespace_command[0];
 			
-			TBGContext::reinitializeI18n();
-
-			if (array_key_exists($module_name, $commands) && array_key_exists($command, $commands[$module_name]))
+			if (array_key_exists($namespace_name, $commands) && array_key_exists($command, $commands[$namespace_name]))
 			{
-				$class = $commands[$module_name][$command];
-				TBGContext::setCLIRouting($module_name, $command);
+				$class = $commands[$namespace_name][$command];
 				$class->execute();
 			}
 			else
 			{
-				TBGCliCommand::cli_echo("\n");
-				TBGCliCommand::cli_echo("Unknown command\n", 'red', 'bold');
-				TBGCliCommand::cli_echo("Type " . TBGCliCommand::getCommandLineName() . ' ');
-				TBGCliCommand::cli_echo('help', 'green', 'bold');
-				TBGCliCommand::cli_echo(" for more information about the cli tool.\n\n");
+				caspar\core\CliCommand::cli_echo("\n");
+				caspar\core\CliCommand::cli_echo("Unknown command\n", 'red', 'bold');
+				caspar\core\CliCommand::cli_echo("Type " . caspar\core\CliCommand::getCommandLineName() . ' ');
+				caspar\core\CliCommand::cli_echo('help', 'green', 'bold');
+				caspar\core\CliCommand::cli_echo(" for more information about the cli tool.\n\n");
 			}
 		}
 		catch (Exception $e)
 		{
-			TBGCliCommand::cli_echo("\n");
-			TBGCliCommand::cli_echo("The following error occured:\n", 'red', 'bold');
-			TBGCliCommand::cli_echo($e->getMessage()."\n\n", 'red');
-			TBGCliCommand::cli_echo("Type " . TBGCliCommand::getCommandLineName() . ' ');
-			TBGCliCommand::cli_echo('help', 'green', 'bold');
-			TBGCliCommand::cli_echo(" for more information about the cli tool.\n\n");
+			caspar\core\CliCommand::cli_echo("\n");
+			caspar\core\CliCommand::cli_echo("The following error occured:\n", 'red', 'bold');
+			caspar\core\CliCommand::cli_echo($e->getMessage()."\n\n", 'red');
+			caspar\core\CliCommand::cli_echo("Type " . caspar\core\CliCommand::getCommandLineName() . ' ');
+			caspar\core\CliCommand::cli_echo('help', 'green', 'bold');
+			caspar\core\CliCommand::cli_echo(" for more information about the cli tool.\n\n");
 		}
 	}
 
