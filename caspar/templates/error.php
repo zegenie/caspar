@@ -41,7 +41,7 @@ body { background-color: #DFDFDF; font-family: sans-serif; font-size: 13px; }
 <![endif]-->
 </head>
 <body>
-	<div class="rounded_box" style="margin: 30px auto 0 auto; width: 700px;">
+	<div class="rounded_box" style="margin: 30px auto 30px auto; width: 700px;">
 		<h1>An error occured in Caspar</h1>
 		<div class="error_content">
 			<h2><?php echo (isset($exception)) ? $exception->getMessage() : $error; ?></h2>
