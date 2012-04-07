@@ -912,7 +912,7 @@ class Caspar
 			if (array_key_exists('class', $trace_element)) {
 				CliCommand::cli_echo($trace_element['class'] . $trace_element['type'] . $trace_element['function'] . '()');
 			} elseif (array_key_exists('function', $trace_element)) {
-				if ($trace_element['class'] == 'caspar\core\Caspar' && in_array($trace_element['function'], array('errorHandler', 'exceptionHandler')))
+				if ($trace_element['class'] == 'caspar\core\Caspar' && array_key_exists('class', $trace_element) && in_array($trace_element['function'], array('errorHandler', 'exceptionHandler')))
 					continue;
 				CliCommand::cli_echo($trace_element['function'] . '()');
 			}
