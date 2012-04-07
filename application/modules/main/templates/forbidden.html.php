@@ -1,4 +1,4 @@
-<?php $csp_response->setTitle('Lobby'); ?>
+<?php $csp_response->setTitle('Forbidden'); ?>
 <br style="clear: both;">
 <div class="main-content">
 	403 Forbidden<br>
