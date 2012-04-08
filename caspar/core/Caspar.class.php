@@ -896,10 +896,10 @@ class Caspar
 		}
 		foreach ($trace_elements as $trace_element) {
 			if (array_key_exists('class', $trace_element)) {
+				if ($trace_element['class'] == 'caspar\\core\\Caspar' && in_array($trace_element['function'], array('errorHandler', 'exceptionHandler')))
+					continue;
 				CliCommand::cli_echo($trace_element['class'] . $trace_element['type'] . $trace_element['function'] . '()');
 			} elseif (array_key_exists('function', $trace_element)) {
-				if ($trace_element['class'] == 'caspar\core\Caspar' && array_key_exists('class', $trace_element) && in_array($trace_element['function'], array('errorHandler', 'exceptionHandler')))
-					continue;
 				CliCommand::cli_echo($trace_element['function'] . '()');
 			}
 			else {
@@ -961,16 +961,16 @@ class Caspar
 
 	public static function errorHandler($code, $error, $file, $line)
 	{
-		if (self::getRequest() instanceof Request && self::getRequest()->isAjaxCall()) {
-			self::getResponse()->ajaxResponseText(404, $error);
-		}
-
-		self::getResponse()->cleanBuffer();
 		$details = compact('code', 'error', 'file', 'line');
 
 		if (self::isCLI()) {
 			self::cliError($error, $details);
 		} else {
+			if (self::getRequest() instanceof Request && self::getRequest()->isAjaxCall()) {
+				self::getResponse()->ajaxResponseText(404, $error);
+			}
+	
+			self::getResponse()->cleanBuffer();
 			require CASPAR_PATH . 'templates' . DS . 'error.php';
 		}
 		die();
