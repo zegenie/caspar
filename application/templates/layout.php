@@ -3,9 +3,6 @@
 	<head>
 		<meta charset="<?php echo \caspar\core\Caspar::getI18n()->getCharset(); ?>">
 		<?php \caspar\core\Event::createNew('core', 'header_begins')->trigger(); ?>
-		<meta name="description" content="The bug genie, friendly issue tracking">
-		<meta name="keywords" content="thebuggenie friendly issue tracking">
-		<meta name="author" content="thebuggenie.com">
 		<title><?php echo strip_tags($csp_response->getTitle()); ?></title>
 		<link rel="shortcut icon" href="<?php print $csp_response->getFaviconURL(); ?>">
 		<?php foreach ($csp_response->getFeeds() as $feed_url => $feed_title): ?>

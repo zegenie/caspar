@@ -6,7 +6,7 @@
 	// Set standard constants needed elsewhere
 	defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 	defined('CASPAR_PATH') || define('CASPAR_PATH', realpath(getcwd() . DS . '..' . DS) . DS . 'caspar' . DS);
-	defined('THEBUGGENIE_SESSION_NAME') || define('CASPAR_SESSION_NAME', 'THEBUGGENIE');
+	defined('CASPAR_SESSION_NAME') || define('CASPAR_SESSION_NAME', 'CASPAR');
 	
 	// Include the "engine" script, which initializes and sets up stuff
 	require CASPAR_PATH . 'bootstrap.inc.php';
