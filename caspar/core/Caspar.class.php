@@ -71,7 +71,7 @@ class Caspar
 	/**
 	 * The i18n object
 	 *
-	 * @Class \thebuggenie\entities\I18n
+	 * @Class \caspar\core\I18n
 	 */
 	static protected $_i18n;
 
@@ -797,7 +797,6 @@ class Caspar
 			$csp_summary['db_timing'] = \b2db\Core::getSQLTiming();
 		}
 		$csp_summary['load_time'] = ($load_time >= 1) ? round($load_time, 2) . ' seconds' : round($load_time * 1000, 1) . 'ms';
-		$csp_summary['scope_id'] = \thebuggenie\core\Context::getScope() instanceof \thebuggenie\core\Scope ? \thebuggenie\core\Context::getScope()->getID() : 'unknown';
 		self::ping();
 	}
 
