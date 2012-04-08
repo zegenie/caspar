@@ -3,7 +3,7 @@
 namespace caspar\core;
 
 /**
- * The core class of the B2 engine
+ * The core class of Caspar
  *
  * @author Daniel Andre Eikeland <zegenie@gmail.com>
  * @version 1.0
@@ -13,7 +13,7 @@ namespace caspar\core;
  */
 
 /**
- * The core class of the B2 engine
+ * The core class of Caspar
  *
  * @package caspar
  * @subpackage core
@@ -53,25 +53,25 @@ class Caspar
 	static protected $_includepath;
 
 	/**
-	 * The path to thebuggenie relative from url server root
+	 * The path to the application relative from url server root
 	 * 
 	 * @var string
 	 */
-	static protected $_tbgpath;
+	static protected $_apppath;
 
 	/**
-	 * Stripped version of the $_tbgpath
+	 * Stripped version of the $_apppath
 	 *
-	 * @see $_tbgpath
+	 * @see $_apppath
 	 *
 	 * @var string
 	 */
-	static protected $_stripped_tbgpath;
+	static protected $_stripped_apppath;
 
 	/**
 	 * The i18n object
 	 *
-	 * @Class \thebuggenie\entities\I18n
+	 * @Class \caspar\core\I18n
 	 */
 	static protected $_i18n;
 
@@ -97,7 +97,7 @@ class Caspar
 	static protected $_factory;
 
 	/**
-	 * Used to determine when the b2 engine started loading
+	 * Used to determine when caspar started loading
 	 * 
 	 * @var integer
 	 */
@@ -201,7 +201,6 @@ class Caspar
 					$classpath = (count($orig_class_details)) ? join(DS, $orig_class_details) . DS : '';
 					$basepath = $namespaces[$namespace];
 					$filename = $basepath . DS . $classpath . $classname_element . '.class.php';
-					$filename_alternate = $basepath . DS . $classpath . "classes" . DS . $classname_element . ".class.php";
 					break;
 				}
 				array_pop($class_details);
@@ -222,6 +221,7 @@ class Caspar
 			require $filename_alternate;
 			return;
 		}
+
 	}
 
 	/**
@@ -232,20 +232,6 @@ class Caspar
 	public static function getClasspaths()
 	{
 		return self::$_classpaths;
-	}
-
-	/**
-	 * Setup the routing object with CLI parameters
-	 *
-	 * @param string $module
-	 * @param string $action
-	 */
-	public static function setCLIRouting($module, $action)
-	{
-		self::$_routing->setCurrentRouteModule($module);
-		self::$_routing->setCurrentRouteAction($action);
-		self::$_routing->setCurrentRouteName('cli');
-		self::$_routing->setCurrentRouteCSRFenabled(false);
 	}
 
 	/**
@@ -315,7 +301,7 @@ class Caspar
 		Logging::log('Loading i18n strings');
 		if (!self::$_i18n = Cache::get("i18n_{$language}")) {
 			Logging::log("Loading strings from file ({$language})");
-			self::$_i18n = new TBGI18n($language);
+			self::$_i18n = new I18n($language);
 			self::$_i18n->initialize();
 			Cache::add("i18n_{$language}", self::$_i18n);
 		} else {
@@ -811,7 +797,6 @@ class Caspar
 			$csp_summary['db_timing'] = \b2db\Core::getSQLTiming();
 		}
 		$csp_summary['load_time'] = ($load_time >= 1) ? round($load_time, 2) . ' seconds' : round($load_time * 1000, 1) . 'ms';
-		$csp_summary['scope_id'] = \thebuggenie\core\Context::getScope() instanceof \thebuggenie\core\Scope ? \thebuggenie\core\Context::getScope()->getID() : 'unknown';
 		self::ping();
 	}
 
@@ -878,74 +863,74 @@ class Caspar
 	{
 		$trace_elements = null;
 		if ($exception instanceof \Exception) {
-			if ($exception instanceof TBGActionNotFoundException) {
-				TBGCliCommand::cli_echo("Could not find the specified action\n", 'white', 'bold');
-			} elseif ($exception instanceof TBGTemplateNotFoundException) {
-				TBGCliCommand::cli_echo("Could not find the template file for the specified action\n", 'white', 'bold');
+			if ($exception instanceof ActionNotFoundException) {
+				CliCommand::cli_echo("Could not find the specified action\n", 'white', 'bold');
+			} elseif ($exception instanceof TemplateNotFoundException) {
+				CliCommand::cli_echo("Could not find the template file for the specified action\n", 'white', 'bold');
 			} elseif ($exception instanceof \b2db\Exception) {
-				TBGCliCommand::cli_echo("An exception was thrown in the B2DB framework\n", 'white', 'bold');
+				CliCommand::cli_echo("An exception was thrown in the B2DB framework\n", 'white', 'bold');
 			} else {
-				TBGCliCommand::cli_echo("An unhandled exception occurred:\n", 'white', 'bold');
+				CliCommand::cli_echo("An unhandled exception occurred:\n", 'white', 'bold');
 			}
-			echo TBGCliCommand::cli_echo($exception->getMessage(), 'red', 'bold') . "\n";
+			echo CliCommand::cli_echo($exception->getMessage(), 'red', 'bold') . "\n";
 			echo "\n";
-			TBGCliCommand::cli_echo('Stack trace') . ":\n";
+			CliCommand::cli_echo('Stack trace') . ":\n";
 			$trace_elements = $exception->getTrace();
 		} else {
 			if ($exception['code'] == 8) {
-				TBGCliCommand::cli_echo('The following notice has stopped further execution:', 'white', 'bold');
+				CliCommand::cli_echo('The following notice has stopped further execution:', 'white', 'bold');
 			} else {
-				TBGCliCommand::cli_echo('The following error occured:', 'white', 'bold');
+				CliCommand::cli_echo('The following error occured:', 'white', 'bold');
 			}
 			echo "\n";
 			echo "\n";
-			TBGCliCommand::cli_echo($title, 'red', 'bold');
+			CliCommand::cli_echo($title, 'red', 'bold');
 			echo "\n";
-			TBGCliCommand::cli_echo("occured in\n");
-			TBGCliCommand::cli_echo($exception['file'] . ', line ' . $exception['line'], 'blue', 'bold');
+			CliCommand::cli_echo("occured in\n");
+			CliCommand::cli_echo($exception['file'] . ', line ' . $exception['line'], 'blue', 'bold');
 			echo "\n";
 			echo "\n";
-			TBGCliCommand::cli_echo("Backtrace:\n", 'white', 'bold');
+			CliCommand::cli_echo("Backtrace:\n", 'white', 'bold');
 			$trace_elements = debug_backtrace();
 		}
 		foreach ($trace_elements as $trace_element) {
 			if (array_key_exists('class', $trace_element)) {
-				TBGCliCommand::cli_echo($trace_element['class'] . $trace_element['type'] . $trace_element['function'] . '()');
-			} elseif (array_key_exists('function', $trace_element)) {
-				if (in_array($trace_element['function'], array('tbg_error_handler', 'tbg_exception')))
+				if ($trace_element['class'] == 'caspar\\core\\Caspar' && in_array($trace_element['function'], array('errorHandler', 'exceptionHandler')))
 					continue;
-				TBGCliCommand::cli_echo($trace_element['function'] . '()');
+				CliCommand::cli_echo($trace_element['class'] . $trace_element['type'] . $trace_element['function'] . '()');
+			} elseif (array_key_exists('function', $trace_element)) {
+				CliCommand::cli_echo($trace_element['function'] . '()');
 			}
 			else {
-				TBGCliCommand::cli_echo('unknown function');
+				CliCommand::cli_echo('unknown function');
 			}
 			echo "\n";
 			if (array_key_exists('file', $trace_element)) {
-				TBGCliCommand::cli_echo($trace_element['file'] . ', line ' . $trace_element['line'], 'blue', 'bold');
+				CliCommand::cli_echo($trace_element['file'] . ', line ' . $trace_element['line'], 'blue', 'bold');
 			} else {
-				TBGCliCommand::cli_echo('unknown file', 'red', 'bold');
+				CliCommand::cli_echo('unknown file', 'red', 'bold');
 			}
 			echo "\n";
 		}
 		if (class_exists('\\b2db\\Core')) {
 			echo "\n";
-			TBGCliCommand::cli_echo("SQL queries:\n", 'white', 'bold');
+			CliCommand::cli_echo("SQL queries:\n", 'white', 'bold');
 			try {
 				$cc = 1;
 				foreach (\b2db\Core::getSQLHits() as $details) {
-					TBGCliCommand::cli_echo("(" . $cc++ . ") [");
+					CliCommand::cli_echo("(" . $cc++ . ") [");
 					$str = ($details['time'] >= 1) ? round($details['time'], 2) . ' seconds' : round($details['time'] * 1000, 1) . 'ms';
-					TBGCliCommand::cli_echo($str);
-					TBGCliCommand::cli_echo("] from ");
-					TBGCliCommand::cli_echo($details['filename'], 'blue');
-					TBGCliCommand::cli_echo(", line ");
-					TBGCliCommand::cli_echo($details['line'], 'white', 'bold');
-					TBGCliCommand::cli_echo(":\n");
-					TBGCliCommand::cli_echo("{$details['sql']}\n");
+					CliCommand::cli_echo($str);
+					CliCommand::cli_echo("] from ");
+					CliCommand::cli_echo($details['filename'], 'blue');
+					CliCommand::cli_echo(", line ");
+					CliCommand::cli_echo($details['line'], 'white', 'bold');
+					CliCommand::cli_echo(":\n");
+					CliCommand::cli_echo("{$details['sql']}\n");
 				}
 				echo "\n";
 			} catch (Exception $e) {
-				TBGCliCommand::cli_echo("Could not generate query list (there may be no database connection)", "red", "bold");
+				CliCommand::cli_echo("Could not generate query list (there may be no database connection)", "red", "bold");
 			}
 		}
 		echo "\n";
@@ -959,15 +944,15 @@ class Caspar
 	 */
 	public static function exceptionHandler($exception)
 	{
-		if (self::getRequest() instanceof Request && self::getRequest()->isAjaxCall()) {
-			self::getResponse()->ajaxResponseText(404, $exception->getMessage());
-		}
-
-		self::getResponse()->cleanBuffer();
-
 		if (self::isCLI()) {
 			self::cliError($exception->getMessage(), $exception);
 		} else {
+			if (self::getRequest() instanceof Request && self::getRequest()->isAjaxCall()) {
+				self::getResponse()->ajaxResponseText(404, $exception->getMessage());
+			}
+	
+			self::getResponse()->cleanBuffer();
+
 			require CASPAR_PATH . 'templates' . DS . 'error.php';
 		}
 		die();
@@ -975,16 +960,16 @@ class Caspar
 
 	public static function errorHandler($code, $error, $file, $line)
 	{
-		if (self::getRequest() instanceof Request && self::getRequest()->isAjaxCall()) {
-			self::getResponse()->ajaxResponseText(404, $error);
-		}
-
-		self::getResponse()->cleanBuffer();
 		$details = compact('code', 'error', 'file', 'line');
 
 		if (self::isCLI()) {
 			self::cliError($error, $details);
 		} else {
+			if (self::getRequest() instanceof Request && self::getRequest()->isAjaxCall()) {
+				self::getResponse()->ajaxResponseText(404, $error);
+			}
+	
+			self::getResponse()->cleanBuffer();
 			require CASPAR_PATH . 'templates' . DS . 'error.php';
 		}
 		die();

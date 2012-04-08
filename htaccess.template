@@ -9,7 +9,7 @@
 # rewrite rules
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /~pk1811/caspar/public/
+  RewriteBase /{CHANGE THIS}
 # Example:
 # RewriteBase /
 # or

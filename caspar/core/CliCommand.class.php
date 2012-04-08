@@ -35,13 +35,13 @@
 
 		protected $_optional_arguments = array();
 		
-		protected $_module = null;
+		protected $_namespace = null;
 
 		abstract protected function do_execute();
 
-		final public function __construct($module = null)
+		final public function __construct($namespace = null)
 		{
-			$this->_module = $module;
+			$this->_namespace = $namespace;
 			$this->_setup();
 		}
 
@@ -53,13 +53,13 @@
 		}
 		
 		/**
-		 * Return the associated module for this command if any
+		 * Return the associated namespace for this command, this will likely correlate to a module
 		 * 
-		 * @return TBGModule 
+		 * @return string
 		 */
-		final protected function getModule()
+		final protected function getNamespace()
 		{
-			return $this->_module;
+			return $this->_namespace;
 		}
 
 		public function getDescription()
