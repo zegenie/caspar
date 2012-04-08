@@ -33,7 +33,7 @@
 		{
 			if (file_exists($fileinfo->getPathname() . DS . 'cli'))
 			{
-				$command_paths[$fileinfo->getFilename()] = $fileinfo->getPathname() . DS . 'cli';
+				$command_paths['application\\'.$fileinfo->getFilename()] = $fileinfo->getPathname() . DS . 'cli';
 			}
 		}
 	}
@@ -48,6 +48,8 @@
 			if (($classname = substr($command_class_file, 0, strpos($command_class_file, '.'))) != '')
 			{
 				$finalname = $namespace_name.'\\cli\\'.$classname;
+
+				$namespace_name = preg_replace('/^application\\\/i', '', $namespace_name);
 
 				$command = new $finalname($namespace_name);
 				if ($command instanceof caspar\core\CliCommand)
