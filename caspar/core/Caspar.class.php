@@ -201,6 +201,7 @@ class Caspar
 					$classpath = (count($orig_class_details)) ? join(DS, $orig_class_details) . DS : '';
 					$basepath = $namespaces[$namespace];
 					$filename = $basepath . DS . $classpath . $classname_element . '.class.php';
+					$filename_alternate = $basepath . DS . $classpath . "classes" . DS . $classname_element . ".class.php";
 					break;
 				}
 				array_pop($class_details);
