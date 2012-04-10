@@ -89,8 +89,9 @@
 								<?php if (array_key_exists('class', $trace_element) && $trace_element['class'] == 'caspar\core\Caspar' && array_key_exists('function', $trace_element) && $trace_element['function'] == 'errorHandler') continue; ?>
 								<li>
 								<?php if (array_key_exists('class', $trace_element)): ?>
+									<?php if ($trace_element['class'] != 'caspar\core\Caspar' && in_array($trace_element['function'], array('errorHandler', 'exceptionHandler'))): continue; endif; ?>
 									<span class="csp-dbg-trace-function"><?php echo $trace_element['class'].$trace_element['type'].$trace_element['function']; ?>()</span>
-								<?php elseif (array_key_exists('function', $trace_element) && array_key_exists('class', $trace_element) && $trace_element['class'] != 'caspar\core\Caspar' && !in_array($trace_element['function'], array('errorHandler', 'exceptionHandler'))): ?>
+								<?php elseif (array_key_exists('function', $trace_element)): ?>
 									<span class="csp-dbg-trace-function"><?php echo $trace_element['function']; ?>()</span>
 								<?php else: ?>
 									<span class="csp-dbg-trace-function">unknown function</span>

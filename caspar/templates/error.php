@@ -71,11 +71,11 @@ body { background-color: #DFDFDF; font-family: sans-serif; font-size: 13px; }
 				<ul>
 					<?php $trace = (isset($exception)) ? $exception->getTrace() : debug_backtrace(); ?>
 					<?php foreach ($trace as $trace_element): ?>
-						<?php if (array_key_exists('class', $trace_element) && $trace_element['class'] == 'caspar\core\Caspar' && array_key_exists('function', $trace_element) && $trace_element['function'] == 'errorHandler') continue; ?>
+						<?php if (array_key_exists('class', $trace_element) && $trace_element['class'] == 'caspar\core\Caspar' && array_key_exists('function', $trace_element) && in_array($trace_element['function'], array('errorHandler', 'exceptionHandler'))) continue; ?>
 						<li>
 						<?php if (array_key_exists('class', $trace_element)): ?>
 							<strong><?php echo $trace_element['class'].$trace_element['type'].$trace_element['function']; ?>()</strong>
-						<?php elseif (array_key_exists('function', $trace_element) && array_key_exists('class', $trace_element) && $trace_element['class'] != 'caspar\core\Caspar' && !in_array($trace_element['function'], array('errorHandler', 'exceptionHandler'))): ?>
+						<?php elseif (array_key_exists('function', $trace_element)): ?>
 							<strong><?php echo $trace_element['function']; ?>()</strong>
 						<?php else: ?>
 							<strong>unknown function</strong>
