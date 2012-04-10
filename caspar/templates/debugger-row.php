@@ -84,7 +84,7 @@
 					</div>
 					<div id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-7-panel" class="csp-dbg-tab-panel" style="display: none;">
 						<ul>
-							<?php $trace = (isset($exception)) ? $exception->getTrace() : debug_backtrace(); ?>
+							<?php $trace = debug_backtrace(); ?>
 							<?php foreach ($trace as $trace_element): ?>
 								<?php if (array_key_exists('class', $trace_element) && $trace_element['class'] == 'caspar\core\Caspar' && array_key_exists('function', $trace_element) && $trace_element['function'] == 'errorHandler') continue; ?>
 								<li>
@@ -100,6 +100,16 @@
 									<span class="csp-dbg-trace-file"><?php echo $trace_element['file']; ?></span>, line <?php echo $trace_element['line']; ?>
 								<?php else: ?>
 									<span class="csp-dbg-trace-file csp-dbg-trace-file-unknown">unknown file</span>
+								<?php endif; ?>
+								<?php if (array_key_exists('args', $trace_element) && count($trace_element['args']) > 0): ?>
+									<br /><i>Arguments</i>
+									<ol>
+										<?php
+										foreach($trace_element['args'] as $arg) {
+											echo '<li>'.$arg.'</li>';
+										}
+										?>
+									</ol>
 								<?php endif; ?>
 								</li>
 							<?php endforeach; ?>
