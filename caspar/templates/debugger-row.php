@@ -37,7 +37,7 @@
 						<?php if (!$csp_debugger->isAjaxRequest()): ?>
 						<p><i>This tab only applies to AJAX requests.</i></p>
 						<?php else: ?>
-						<p><i>This is a list of all items in the JSON output.</i></p>
+						<p><i>This is a list of all items in any JSON output from the call. If this list is empty, the AJAX request has not used JSON.</i></p>
 						<?php foreach ($dbgjson as $field => $value): ?>
 						<div class="csp-dbg-json-field"><?php echo $field; ?></div>
 						<pre class="csp-dbg-json-value"><?php echo $value; ?></pre>

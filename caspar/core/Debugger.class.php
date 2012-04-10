@@ -48,11 +48,11 @@
 		}
 
 		public function isAjaxRequest() {
-			return false;
+			return \caspar\core\Caspar::getRequest()->isAjaxCall();
 		}
 
 		public function setJsonOutput($output) {
-			$this->_jsonoutput = json_decode($output);
+			$this->_jsonoutput = $output;
 		}
 
 		public function getJsonOutput() {
@@ -87,5 +87,13 @@
 			$cspdbgrow = time();
 			$csp_debugger = $this;
 			require CASPAR_PATH . 'templates' . DS . 'debugger-row.php';
+		}
+
+		public function returnCurrentPageRow() {
+			ob_start();
+			$this->getCurrentPageRow();
+			$row = ob_get_contents();
+			ob_end_clean();
+			return $row;
 		}
 	}
