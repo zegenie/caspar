@@ -1,0 +1,173 @@
+#csp-dbg-main, #csp-dbg-open {
+	font-family: sans-serif;
+	font-size: 12px;
+}
+
+#csp-dbg-main p {
+	margin: 0;
+	padding-bottom: 10px;
+}
+
+#csp-dbg-open {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	padding: 4px;
+	background: black;
+	color: white;
+	text-align: center;
+	background: #45484d; /* Old browsers */
+	background: -moz-linear-gradient(top,  #45484d 0%, #000000 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#45484d), color-stop(100%,#000000)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #45484d 0%,#000000 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #45484d 0%,#000000 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #45484d 0%,#000000 100%); /* IE10+ */
+	background: linear-gradient(top,  #45484d 0%,#000000 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#45484d', endColorstr='#000000',GradientType=0 ); /* IE6-9 */
+	-webkit-box-shadow: 0px 0px 10px rgba(50, 50, 50, 0.75);
+	-moz-box-shadow:    0px 0px 10px rgba(50, 50, 50, 0.75);
+	box-shadow:         0px 0px 10px rgba(50, 50, 50, 0.75);
+}
+
+#csp-dbg-open-btn {
+	padding: 6px;
+	border: 1px solid transparent;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	opacity: 0.8;
+}
+
+#csp-dbg-open-btn:hover {
+	padding: 6px;
+	border: 1px solid #005596;
+	cursor: pointer;
+	background: #3f4c6b; /* Old browsers */
+	background: -moz-linear-gradient(top,  #3f4c6b 0%, #282f44 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#3f4c6b), color-stop(100%,#282f44)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #3f4c6b 0%,#282f44 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #3f4c6b 0%,#282f44 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #3f4c6b 0%,#282f44 100%); /* IE10+ */
+	background: linear-gradient(top,  #3f4c6b 0%,#282f44 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3f4c6b', endColorstr='#282f44',GradientType=0 ); /* IE6-9 */
+}
+
+#csp-dbg-main {
+	background-color: rgba(0, 0, 0, 0.5);
+	height: 100%;
+	width: 100%;
+	top: 0;
+	left: 0;
+	position: absolute;
+}
+
+#csp-dbg-title {
+	font-size: 30px;
+	color: white;
+	background: #45484d; /* Old browsers */
+	background: -moz-linear-gradient(top,  #45484d 0%, #000000 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#45484d), color-stop(100%,#000000)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #45484d 0%,#000000 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #45484d 0%,#000000 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #45484d 0%,#000000 100%); /* IE10+ */
+	background: linear-gradient(top,  #45484d 0%,#000000 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#45484d', endColorstr='#000000',GradientType=0 ); /* IE6-9 */
+	padding: 15px;
+}
+
+.csp-dbg-title-close, .csp-dbg-entry-open, .csp-dbg-entry-close {
+	float: right;
+	cursor: pointer;
+}
+
+.csp-dbg-entry-row {
+	background: #333333; /* Old browsers */
+	border-top: 1px solid #555555;
+	border-bottom: 1px solid black;
+	color: white;
+	font-size: 20px;
+	padding: 10px;
+}
+
+#csp-dbg-row-ver {
+	font-size: 12px;
+	font-style: italic;
+}
+
+.csp-dbg-entry-row-content {
+	background: white;
+	padding: 20px;
+}
+
+.csp-dbg-tab-panels .csp-dbg-tab-panel {
+	border: 1px solid black;
+	border-top: none;
+	padding: 10px;
+}
+
+.csp-dbg-tab-bar {
+	border-bottom: 1px solid black;
+	margin: 0;
+	padding: 0;
+	padding-bottom: 7px;
+}
+
+.csp-dbg-tab-bar li {
+	display: inline;
+	height: 50px;
+	background: #CCCCCC;
+	padding: 7px;
+	margin: 0;
+	border: 1px solid black;
+	cursor: pointer;
+}
+
+.csp-dbg-tab-bar li.csp-dbg-row-content-tab-selected {
+	border-bottom: 1px solid white;
+	background: white;
+}
+
+#csp-dbg-next-row-id {
+	display: none;
+}
+
+.csp-dbg-log-level {
+	font-weight: bold;
+}
+
+.csp-dbg-log-source {
+	font-weight: bold;
+}
+
+.csp-dbg-log-time, .csp-dbg-query-title-time, .csp-dbg-timing-time {
+	color: #AAA;
+	font-style: italic;
+}
+
+.csp-dbg-query-title-id, .csp-dbg-variable-title-id, .csp-dbg-timing-id, .csp-dbg-json-field {
+	font-weight: bold;
+}
+
+.csp-dbg-query-body, .csp-dbg-variable-content, .csp-dbg-json-value {
+	padding-top: 5px;
+	margin: 0;
+	padding-bottom: 5px;
+	margin-bottom: 10px;
+	border-bottom: 1px dotted #AAA;
+}
+
+.csp-dbg-json {
+	width: 100%;
+}
+
+.csp-dbg-trace-file {
+	color: #55F;
+}
+
+.csp-dbg-trace-file-unknown {
+	color: #AAA;
+}
+
+.csp-dbg-trace-function {
+	font-weight: bold;
+}

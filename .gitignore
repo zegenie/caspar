@@ -1,3 +1,4 @@
 public/.htaccess
 application/cache
 application/configuration/caspar.yml
+.DS_Store

@@ -132,6 +132,13 @@ class Caspar
 	static protected $_routing;
 
 	/**
+	 * The debugger object
+	 *
+	 * @var Debugger
+	 */
+	static protected $_debugger = null;
+
+	/**
 	 * Messages passed on from the previous request
 	 *
 	 * @var array
@@ -1011,6 +1018,7 @@ class Caspar
 			self::autoloadNamespace('al13_debug', \CASPAR_LIB_PATH . DS . 'al13_debug' . DS);
 			require \CASPAR_LIB_PATH . 'al13_debug' . DS . 'bootstrap.php';
 			self::getResponse()->addStylesheet('css/debugger.css');
+			self::$_debugger = new Debugger();
 		} else {
 			self::$_debug_mode = false;
 		}
@@ -1171,6 +1179,11 @@ class Caspar
 	public static function getSalt()
 	{
 		return self::$_configuration['core']['salt'];
+	}
+
+	public static function getDebugger()
+	{
+		return self::$_debugger;
 	}
 
 }
