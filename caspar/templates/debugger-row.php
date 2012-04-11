@@ -4,6 +4,12 @@
 	$dbgstored = $csp_debugger->getStoredVariables();
 	$dbglog = \caspar\core\Logging::getEntries();
 	$dbgpartials = $csp_debugger->getPartials();
+
+	if (\b2db\Core::isConnected()) {
+		$dbgqueries = \b2db\Core::getSQLHits();
+		$dbgquerytime = \b2db\Core::getSQLTiming();
+		$dbgquerycount = \b2db\Core::getSQLCount();
+	} 
 ?>
 
 			<div class="csp-dbg-entry-row" id="csp-dbg-row-<?php echo $cspdbgrow; ?>">
@@ -21,7 +27,7 @@
 					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-2" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,2);">JSON Output (<?php echo count($dbgjson); ?>)</li>
 					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-3" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,3);">Timings (<?php echo count($dbgpartials); ?>)</li>
 					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-4" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,4);">Caspar log (<?php echo count($dbglog); ?>)</li>
-					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-5" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,5);">Database queries (0 please implement me)</li>
+					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-5" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,5);">Database queries (<?php if (\b2db\Core::isConnected()): echo $dbgquerycount-1; else: echo 'not connected'; endif; ?>)</li>
 					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-6" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,6);">Stored variables (<?php echo count($dbgstored); ?>)</li>
 					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-7" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,7);">Backtrace</li>
 				</ul>
@@ -32,6 +38,26 @@
 							<li><b>Execution time:</b> <?php echo $csp_debugger->getExecutionTime(); ?> seconds</li>
 							<li><b>AJAX query?</b> <?php if ($csp_debugger->isAjaxRequest()): ?>Yes<?php else: ?>No<?php endif; ?></li>
 						</ul>
+						<b>SQL details:</b>
+<?php if (\b2db\Core::isInitialized()): ?>
+						<ul>
+							<li><b>Driver:</b> <?php echo \b2db\Core::getDBtype(); ?></li>
+							<li><b>DSN:</b> <?php echo \b2db\Core::getDSN(); ?>
+								<ul>
+									<li><b>Hostname:</b> <?php echo \b2db\Core::getHost(); ?>:<?php echo \b2db\Core::getPort(); ?></li>
+									<li><b>Database:</b> <?php echo \b2db\Core::getDBname(); ?></li>
+								</ul>
+							</li>
+							<li><b>Username:</b> <?php echo \b2db\Core::getUname(); ?></li>
+							<li><b>Prefix:</b> <?php echo \b2db\Core::getTablePrefix(); ?></li>
+							<li><b>Connection status:</b> <?php echo (\b2db\Core::isConnected()) ? 'Connected' : 'Not connected'; ?></li>
+<?php if (\b2db\Core::isConnected()): ?>
+							<li><b>Total query time:</b> <?php if(empty($dbgquerytime)): echo '0 ms'; else: echo ($dbgquerytime > 1) ? round($dbgquerytime, 2) . 's' : round($dbgquerytime * 1000, 1) . 'ms'; endif; ?></li>
+<?php endif; ?>
+						</ul>
+<?php else: ?>
+						<i>B2DB not initialised</i>
+<?php endif; ?>
 					</div>
 					<div id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-2-panel" class="csp-dbg-tab-panel" style="display: none;">
 						<?php if (!$csp_debugger->isAjaxRequest()): ?>
@@ -61,19 +87,18 @@
 						</div>
 					</div>
 					<div id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-5-panel" class="csp-dbg-tab-panel" style="display: none;">
+<?php if (\b2db\Core::isConnected()): ?>
 						<p><i>This list shows all the SQL queries that have been made, and how long each took.</i></p>
+						<?php $i = 0; ?>
+						<?php foreach ($dbgqueries as $entry): ?>
+							<?php $i++; ?>
 						<div class="csp-dbg-query-title">
-							<span class="csp-dbg-query-title-id">Query 1</span> <span class="csp-dbg-query-title-time">10ms</span> <span class="csp-dbg-query-title-file"> - foo.php:123</span>
+							<span class="csp-dbg-query-title-id">Query <?php echo $i; ?></span> <span class="csp-dbg-query-title-time"><?php echo ($details['time'] >= 1) ? round($details['time'], 2) . ' seconds' : round($details['time'] * 1000, 1) . 'ms'; ?></span> <span class="csp-dbg-query-title-file"> - <?php echo $entry['filename']; ?>:<?php echo $entry['line']; ?></span>
 						</div>
-						<div class="csp-dbg-query-body">
-							<code>SELECT * FROM foo;</code>
-						</div>
-						<div class="csp-dbg-query-title">
-							<span class="csp-dbg-query-title-id">Query 2</span> <span class="csp-dbg-query-title-time">10ms</span> <span class="csp-dbg-query-title-file"> - foo.php:123</span>
-						</div>
-						<div class="csp-dbg-query-body">
-							<code>SELECT * FROM foo;</code>
-						</div>
+						<?php endforeach; ?>
+<?php else: ?>
+						<p><i>Not connected to the database. Ensure the connection parameters are correct on the Summary tab, and run <code>\b2db\Core::doConnect();</code> to connect to the database.</i></p>
+<?php endif; ?>
 					</div>
 					<div id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-6-panel" class="csp-dbg-tab-panel" style="display: none;">
 						<p><i>You can store a variable for inspection here using the <code>storeVariable()</code> method on your Debugger instance - see the documentation for details.</i></p>

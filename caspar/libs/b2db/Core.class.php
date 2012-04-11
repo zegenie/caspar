@@ -105,6 +105,8 @@
 				if (array_key_exists('password', $configuration) && $configuration['password']) self::setPasswd($configuration['password']);
 				if (array_key_exists('database', $configuration) && $configuration['database']) self::setDBname($configuration['database']);
 				if (array_key_exists('tableprefix', $configuration) && $configuration['tableprefix']) self::setTablePrefix($configuration['tableprefix']);
+
+				self::setDebugMode(\caspar\core\Caspar::isDebugMode());
 			}
 			catch (\Exception $e)
 			{
@@ -521,7 +523,7 @@
 			}
 			catch (\PDOException $e)
 			{
-				throw new Exception("COuld not connect to the database [".$e->getMessage()."], dsn: {$dsn}");
+				throw new Exception("Could not connect to the database [".$e->getMessage()."], dsn: {$dsn}");
 			}
 			catch (Exception $e)
 			{

@@ -1053,6 +1053,7 @@ class Caspar
 		if (array_key_exists($service, self::$_serviceconfigurations)) {
 			return self::$_serviceconfigurations[$service];
 		}
+		return false;
 	}
 
 	public static function getService($service)
@@ -1101,23 +1102,6 @@ class Caspar
 			}
 		}
 		self::$_configuration['routes'] = $routes;
-	}
-
-	public static function getB2DBInstance($config = 'default')
-	{
-		\b2db\Core::setCachePath(\CASPAR_CACHE_PATH);
-		if (!array_key_exists($config, self::$_b2db)) {
-			$configuration = self::$_configuration['b2db'][$config];
-			Logging::log('Initializing B2DB');
-			$b2db = \b2db\Core::getInstance($configuration);
-			Logging::log('...done (Initializing B2DB)');
-			$b2db->connect();
-
-			self::$_b2db[$config] = $b2db;
-			Logging::log('...done');
-		}
-
-		return self::$_b2db[$config];
 	}
 
 	public static function initialize()
