@@ -123,13 +123,6 @@
 		 * @var unknown_type
 		 */
 		protected $_decor_footer = null;
-		
-		/**
-		 * Whether to show the project menu strip or not
-		 *
-		 * @var boolean
-		 */
-		protected $_project_menu_strip_visible = true;
 
 		public function __construct($javascripts = array(), $stylesheets = array())
 		{
@@ -147,6 +140,16 @@
 			$this->setContentType('application/json');
 			$this->setHttpStatus($code);
 			$this->renderHeaders();
+
+			if (\caspar\core\Caspar::isDebugMode()) {
+				$json_data = array('error' => $error);
+				\caspar\core\Caspar::getDebugger()->setJsonOutput($json_data);
+
+				$json_data['csp-debugger'] = \caspar\core\Caspar::getDebugger()->returnCurrentPageRow();
+				echo json_encode($json_data);
+				die();
+			}
+
 			echo json_encode(array('error' => $error));
 			die();
 		}

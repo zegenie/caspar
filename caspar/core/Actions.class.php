@@ -88,6 +88,16 @@
 		{
 			$this->getResponse()->setContentType('application/json');
 			$this->getResponse()->setDecoration(Response::DECORATE_NONE);
+
+			if (\caspar\core\Caspar::isDebugMode()) {
+				$json_data = $text;
+				\caspar\core\Caspar::getDebugger()->setJsonOutput($json_data);
+
+				$json_data['csp-debugger'] = \caspar\core\Caspar::getDebugger()->returnCurrentPageRow();
+				echo json_encode($json_data);
+				return true;
+			}
+
 			echo json_encode($text);
 			return true;
 		}
