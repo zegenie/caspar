@@ -123,13 +123,6 @@
 		 * @var unknown_type
 		 */
 		protected $_decor_footer = null;
-		
-		/**
-		 * Whether to show the project menu strip or not
-		 *
-		 * @var boolean
-		 */
-		protected $_project_menu_strip_visible = true;
 
 		public function __construct($javascripts = array(), $stylesheets = array())
 		{
