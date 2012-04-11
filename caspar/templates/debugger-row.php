@@ -73,7 +73,7 @@
 					<div id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-3-panel" class="csp-dbg-tab-panel" style="display: none;">
 						<p><i>This list shows how long actions and templates in this request take to load.</i></p>
 						<?php foreach ($dbgpartials as $partial => $data): ?>
-							<span class="csp-dbg-timing-id"><?php echo $partial; ?></span> <span class="csp-dbg-timing-time">Accessed <?php echo $data['count']; ?> time(s), totalling <?php echo ($data['time'] >= 1) ? round($data['time'], 2) . ' seconds' : round($data['time'] * 1000, 1) . 'ms'; ?></span><br />
+							<span class="csp-dbg-timing-id"><?php echo $partial; ?></span> <span class="csp-dbg-timing-time">Accessed <?php echo $data['count']; ?> time(s), totalling <?php echo ($data['time'] >= 1) ? round($data['time'], 2) . ' seconds' : round($data['time'] * 1000, 1) . 'ms'; ?>, averaging <?php echo (($data['time']/$data['count']) >= 1) ? round(($data['time']/$data['count']), 2) . ' seconds' : round(($data['time']/$data['count']) * 1000, 1) . 'ms'; ?></span><br />
 						<?php endforeach; ?>
 					</div>
 					<div id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-4-panel" class="csp-dbg-tab-panel" style="display: none;">
