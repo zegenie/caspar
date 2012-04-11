@@ -22,5 +22,6 @@
 	</head>
 	<body>
 		<?php echo $content; ?>
+		<?php \caspar\core\Debugger::display(); ?>
 	</body>
 </html>

@@ -45,7 +45,7 @@ body { background-color: #DFDFDF; font-family: sans-serif; font-size: 13px; }
 		<h1>An error occured in Caspar</h1>
 		<div class="error_content">
 			<h2><?php echo (isset($exception)) ? $exception->getMessage() : $error; ?></h2>
-			<?php if ($exception instanceof \Exception): ?>
+			<?php if (isset($exception) && $exception instanceof \Exception): ?>
 				<?php if ($exception instanceof ActionNotFoundException): ?>
 					<h3>Could not find the specified action</h3>
 				<?php elseif ($exception instanceof TemplateNotFoundException): ?>
@@ -71,11 +71,11 @@ body { background-color: #DFDFDF; font-family: sans-serif; font-size: 13px; }
 				<ul>
 					<?php $trace = (isset($exception)) ? $exception->getTrace() : debug_backtrace(); ?>
 					<?php foreach ($trace as $trace_element): ?>
-						<?php if (array_key_exists('class', $trace_element) && $trace_element['class'] == 'caspar\core\Caspar' && array_key_exists('function', $trace_element) && $trace_element['function'] == 'errorHandler') continue; ?>
+						<?php if (array_key_exists('class', $trace_element) && $trace_element['class'] == 'caspar\core\Caspar' && array_key_exists('function', $trace_element) && in_array($trace_element['function'], array('errorHandler', 'exceptionHandler'))) continue; ?>
 						<li>
 						<?php if (array_key_exists('class', $trace_element)): ?>
 							<strong><?php echo $trace_element['class'].$trace_element['type'].$trace_element['function']; ?>()</strong>
-						<?php elseif (array_key_exists('function', $trace_element) && array_key_exists('class', $trace_element) && $trace_element['class'] != 'caspar\core\Caspar' && !in_array($trace_element['function'], array('errorHandler', 'exceptionHandler'))): ?>
+						<?php elseif (array_key_exists('function', $trace_element)): ?>
 							<strong><?php echo $trace_element['function']; ?>()</strong>
 						<?php else: ?>
 							<strong>unknown function</strong>
