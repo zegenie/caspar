@@ -193,7 +193,7 @@
 				}
 				if ($row === null)
 				{
-					$row = self::getB2DBTable()->getByID($id);
+					$row = self::getB2DBTable()->doSelectById($id);
 				}
 
 				if (!$row instanceof Row)
