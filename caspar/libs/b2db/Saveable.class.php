@@ -154,13 +154,13 @@
 		protected function _preDelete() {}
 		
 		protected function _postDelete() {}
+		
+		protected function _preMorph() {}
+		
+		protected function _postMorph(Saveable $original_object) {}
 
 		public function getB2DBSaveablePropertyValue($property_name)
 		{
-//			$column = explode('.', $column);
-//			if (!array_key_exists(1, $column)) {
-//				throw new \Exception("Could not find class property");
-//			}
 			if (!property_exists($this, $property_name))
 			{
 				throw new \Exception("Could not find class property '{$property_name}' in class ".get_class($this).". The class must have all properties from the corresponding B2DB table class available");
@@ -238,6 +238,73 @@
 			$this->_preDelete();
 			self::getB2DBTable()->doDeleteById($this->getB2DBID());
 			$this->_postDelete();
+		}
+		
+		final public function getB2DBMorphedDataArray()
+		{
+			$table = self::getB2DBTable();
+			$table_name = $table->getB2DBName();
+			$id_column = $table->getIdColumn();
+			$data = array();
+			foreach ($table->getColumns() as $column)
+			{
+				$property_name = $column['property'];
+				$data[$property_name] = $this->$property_name;
+			}
+			
+			return $data;
+		}
+		
+		final public function B2DBpopulateMorphedData(Saveable $original_object, $keep_id = true)
+		{
+			$this->_preMorph();
+			$data = $original_object->getB2DBMorphedDataArray();
+			$table = self::getB2DBTable();
+			$table_name = $table->getB2DBName();
+			$id_column = $table->getIdColumn();
+			foreach ($table->getColumns() as $column)
+			{
+				if (!$keep_id && $column['name'] == $id_column) continue;
+				$property_name = $column['property'];
+				if (!array_key_exists($property_name, $data)) continue;
+				$this->$property_name = $data[$property_name];
+			}
+			$this->_postMorph($original_object);
+		}
+		
+		/**
+		 * Returns an existing Saveable object morphed to an object of a 
+		 * different class - either the one specified, or as specified by the 
+		 * @SubClass annotation
+		 * 
+		 * @param string $classname[optional] The FQCN to morph into
+		 * @param boolean $keep_id[optional] Whether to keep the id or not
+		 * 
+		 * @return \b2db\Saveable The morphed object, or this object if unmorphed
+		 * 
+		 * @throws \b2db\Exception 
+		 */
+		final public function morph($classname = null, $keep_id = true)
+		{
+			if ($classname === null) {
+				$table = $this->getB2DBTable();
+				$classnames = Core::getCachedTableEntityClasses(\get_class($table));
+				if ($classnames === null) {
+					return $this;
+				}
+				$columns = $table->getColumns();
+				$property = $columns[$table->getB2DBName() . '.' . $classnames['identifier']]['property'];
+				$identifier = $this->$property;
+				$classname = (\array_key_exists($identifier, $classnames['classes'])) ? $classnames['classes'][$identifier] : null;
+				if (!$classname) {
+					throw new Exception("No classname has been specified in the @SubClasses annotation for identifier '{$identifier}'");
+				}
+			}
+			$morphed_object = new $classname();
+			if ($morphed_object instanceof Saveable) {
+				$morphed_object->B2DBpopulateMorphedData($this, $keep_id);
+			}
+			return $morphed_object;
 		}
 		
 	}
