@@ -201,6 +201,7 @@ class Caspar
 					$classpath = (count($orig_class_details)) ? join(DS, $orig_class_details) . DS : '';
 					$basepath = $namespaces[$namespace];
 					$filename = $basepath . DS . $classpath . $classname_element . '.class.php';
+					$filename_alternate = $basepath . DS . $classpath . 'classes' . DS . $classname_element . '.class.php';
 					break;
 				}
 				array_pop($class_details);
@@ -210,6 +211,7 @@ class Caspar
 			foreach ($namespaces[0] as $classpath) {
 				if (file_exists($classpath . DS . $classname . '.class.php')) {
 					$filename = $classpath . DS . $classname . '.class.php';
+					$filename_alternate = $classpath . DS . 'classes' . DS . $classname . '.class.php';
 					break;
 				}
 			}
@@ -221,7 +223,6 @@ class Caspar
 			require $filename_alternate;
 			return;
 		}
-
 	}
 
 	/**
