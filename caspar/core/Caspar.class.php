@@ -132,6 +132,13 @@ class Caspar
 	static protected $_routing;
 
 	/**
+	 * The debugger object
+	 *
+	 * @var Debugger
+	 */
+	static protected $_debugger = null;
+
+	/**
 	 * Messages passed on from the previous request
 	 *
 	 * @var array
@@ -201,7 +208,7 @@ class Caspar
 					$classpath = (count($orig_class_details)) ? join(DS, $orig_class_details) . DS : '';
 					$basepath = $namespaces[$namespace];
 					$filename = $basepath . DS . $classpath . $classname_element . '.class.php';
-					$filename_alternate = $basepath . DS . $classpath . 'classes' . DS . $classname_element . '.class.php';
+					$filename_alternate = $basepath . DS . $classpath . "classes" . DS . $classname_element . ".class.php";
 					break;
 				}
 				array_pop($class_details);
@@ -1011,6 +1018,8 @@ class Caspar
 			self::autoloadNamespace('al13_debug', \CASPAR_LIB_PATH . DS . 'al13_debug' . DS);
 			require \CASPAR_LIB_PATH . 'al13_debug' . DS . 'bootstrap.php';
 			self::getResponse()->addStylesheet('css/debugger.css');
+			self::getResponse()->addStylesheet('css/cspdebugger.css');
+			self::$_debugger = new Debugger();
 		} else {
 			self::$_debug_mode = false;
 		}
@@ -1044,6 +1053,7 @@ class Caspar
 		if (array_key_exists($service, self::$_serviceconfigurations)) {
 			return self::$_serviceconfigurations[$service];
 		}
+		return false;
 	}
 
 	public static function getService($service)
@@ -1092,23 +1102,6 @@ class Caspar
 			}
 		}
 		self::$_configuration['routes'] = $routes;
-	}
-
-	public static function getB2DBInstance($config = 'default')
-	{
-		\b2db\Core::setCachePath(\CASPAR_CACHE_PATH);
-		if (!array_key_exists($config, self::$_b2db)) {
-			$configuration = self::$_configuration['b2db'][$config];
-			Logging::log('Initializing B2DB');
-			$b2db = \b2db\Core::getInstance($configuration);
-			Logging::log('...done (Initializing B2DB)');
-			$b2db->connect();
-
-			self::$_b2db[$config] = $b2db;
-			Logging::log('...done');
-		}
-
-		return self::$_b2db[$config];
 	}
 
 	public static function initialize()
@@ -1171,6 +1164,11 @@ class Caspar
 	public static function getSalt()
 	{
 		return self::$_configuration['core']['salt'];
+	}
+
+	public static function getDebugger()
+	{
+		return self::$_debugger;
 	}
 
 }
