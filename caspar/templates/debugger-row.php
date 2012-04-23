@@ -131,8 +131,19 @@
 									<br /><i>Arguments</i>
 									<ol>
 										<?php
-										foreach($trace_element['args'] as $arg) {
-											echo '<li>'.$arg.'</li>';
+										foreach($trace_element['args'] as $varname => $arg) {
+											echo '<li>';
+											switch (true) {
+												case is_object($arg):
+													echo "Object of class ". get_class($arg);
+													break;
+												case is_bool($arg):
+													echo ($arg) ? 'true' : 'false';
+													break;
+												default:
+													echo $arg;
+											}
+											echo '</li>';
 										}
 										?>
 									</ol>
