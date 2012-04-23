@@ -32,6 +32,10 @@
 	caspar\core\Caspar::autoloadNamespace('caspar\\core', CASPAR_CORE_PATH);
 	caspar\core\Caspar::autoloadNamespace('application\\modules', CASPAR_MODULES_PATH);
 	caspar\core\Caspar::autoloadNamespace('application\\entities', CASPAR_ENTITIES_PATH);
+	if (caspar\core\Caspar::isDebugMode()) {
+		caspar\core\Caspar::autoloadNamespace('al13_debug\\util', CASPAR_LIB_PATH);
+		require CASPAR_LIB_PATH . 'al13_debug' . DS . 'bootstrap.php';
+	}
 	caspar\core\Caspar::addAutoloaderClassPath(CASPAR_LIB_PATH);
 
 	if (!isset($argc) && !ini_get('session.auto_start')) {
