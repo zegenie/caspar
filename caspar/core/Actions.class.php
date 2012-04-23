@@ -117,6 +117,11 @@
 			return Caspar::getRouting();
 		}
 
+		protected function getI18n()
+		{
+			return Caspar::getI18n();
+		}
+
 		protected function getUser()
 		{
 			return Caspar::getUser();
