@@ -1017,7 +1017,7 @@ class Caspar
 			self::$_debug_mode = true;
 			self::getResponse()->addStylesheet('/css/debugger.css');
 			self::getResponse()->addStylesheet('/css/cspdebugger.css');
-			self::autoloadNamespace('al13_debug\\util', CASPAR_LIB_PATH);
+			self::autoloadNamespace('al13_debug\\util', CASPAR_LIB_PATH . 'al13_debug' . DS . 'util' . DS);
 			require CASPAR_LIB_PATH . 'al13_debug' . DS . 'bootstrap.php';
 			self::$_debugger = new Debugger();
 		} else {

@@ -14,6 +14,9 @@
 
 			<div class="csp-dbg-entry-row" id="csp-dbg-row-<?php echo $cspdbgrow; ?>">
 				<?php if ($csp_debugger->isAjaxRequest()): ?>AJAX Request<?php else: ?>This page<?php endif; ?> - <?php echo $csp_debugger->getRouting()->getCurrentRouteName(); ?>
+				<span class="csp-dbg-entry-timestamp">
+					&nbsp;&nbsp;<?php echo date('H:i:s (d-m-Y)'); ?>
+				</span>
 				<div class="csp-dbg-entry-open" id="csp-dbg-row-<?php echo $cspdbgrow; ?>-open" onClick="cspexpandEntry(<?php echo $cspdbgrow; ?>);">
 					&#x25BC;
 				</div>
