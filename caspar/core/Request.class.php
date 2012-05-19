@@ -43,7 +43,7 @@
 		 * 
 		 * @return TBGFile The TBGFile object
 		 */
-		public function handleUpload($key)
+		public function handleUpload($key, $file_name = null, $file_dir = null)
 		{
 			$apc_exists = self::CanGetUploadStatus();
             if ($apc_exists && !array_key_exists($this->getParameter('APC_UPLOAD_PROGRESS'), $_SESSION['__upload_status'])) {
@@ -57,140 +57,54 @@
             }
 			try
 			{
-				if ($this->getUploadedFile($key) !== null)
+				$thefile = $this->getUploadedFile($key);
+				if ($thefile !== null)
 				{
-					$thefile = $this->getUploadedFile($key);
-					if (Settings::isUploadsEnabled())
+					if ($thefile['error'] == UPLOAD_ERR_OK)
 					{
-						Logging::log('Uploads enabled');
-						if ($thefile['error'] == UPLOAD_ERR_OK)
+						Logging::log('No upload errors');
+						if (is_uploaded_file($thefile['tmp_name']))
 						{
-							Logging::log('No upload errors');
-							if (filesize($thefile['tmp_name']) > Settings::getUploadsMaxSize(true) && Settings::getUploadsMaxSize() > 0)
+							Logging::log('Uploaded file is uploaded');
+							$files_dir = ($file_dir === null) ? Caspar::getUploadPath() : $file_dir;
+							$new_filename = ($file_name === null) ? Caspar::getUser()->getID() . '_' . NOW . '_' . basename($thefile['name']) : $file_name;
+							Logging::log('Moving uploaded file to '.$new_filename);
+							if (!move_uploaded_file($thefile['tmp_name'], $files_dir . $new_filename))
 							{
-								throw new \Exception(Caspar::getI18n()->__('You cannot upload files bigger than %max_size% MB', array('%max_size%' => Settings::getUploadsMaxSize())));
-							}
-							Logging::log('Upload filesize ok');
-							$extension = mb_substr(basename($thefile['name']), mb_strpos(basename($thefile['name']), '.'));
-							if ($extension == '')
-							{
-								Logging::log('OOps, could not determine upload filetype', 'main', Logging::LEVEL_WARNING_RISK);
-								//throw new \Exception(Caspar::getI18n()->__('Could not determine filetype'));
+								Logging::log('Moving uploaded file failed!');
+								throw new \Exception(Caspar::getI18n()->__('An error occured when saving the file'));
 							}
 							else
 							{
-								Logging::log('Checking uploaded file extension');
-								$extension = mb_substr($extension, 1);
-								$upload_extensions = Settings::getUploadsExtensionsList();
-								if (Settings::getUploadsRestrictionMode() == 'blacklist')
-								{
-									Logging::log('... using blacklist');
-									foreach ($upload_extensions as $an_ext)
-									{
-										if (mb_strtolower(trim($extension)) == mb_strtolower(trim($an_ext)))
-										{
-											Logging::log('Upload extension not ok');
-											throw new \Exception(Caspar::getI18n()->__('This filetype is not allowed'));
-										}
-									}
-									Logging::log('Upload extension ok');
-								}
-								else
-								{
-									Logging::log('... using whitelist');
-									$is_ok = false;
-									foreach ($upload_extensions as $an_ext)
-									{
-										if (mb_strtolower(trim($extension)) == mb_strtolower(trim($an_ext)))
-										{
-											Logging::log('Upload extension ok');
-											$is_ok = true;
-											break;
-										}
-									}
-									if (!$is_ok)
-									{
-										Logging::log('Upload extension not ok');
-										throw new \Exception(Caspar::getI18n()->__('This filetype is not allowed'));
-									}
-								}
-								/*if (in_array(mb_strtolower(trim($extension)), array('php', 'asp')))
-								{
-									Logging::log('Upload extension is php or asp');
-									throw new \Exception(Caspar::getI18n()->__('This filetype is not allowed'));
-								}*/
-							}
-							if (is_uploaded_file($thefile['tmp_name']))
-							{
-								Logging::log('Uploaded file is uploaded');
-								$files_dir = Settings::getUploadsLocalpath();
-								$new_filename = Caspar::getUser()->getID() . '_' . NOW . '_' . basename($thefile['name']);
-								Logging::log('Moving uploaded file to '.$new_filename);
-								if (!move_uploaded_file($thefile['tmp_name'], $files_dir . $new_filename))
-								{
-									Logging::log('Moving uploaded file failed!');
-									throw new \Exception(Caspar::getI18n()->__('An error occured when saving the file'));
-								}
-								else
-								{
-									Logging::log('Upload complete and ok, storing upload status and returning filename '.$new_filename);
-									$content_type = TBGFile::getMimeType($files_dir.$new_filename);
-									$file = new TBGFile();
-									$file->setRealFilename($new_filename);
-									$file->setOriginalFilename(basename($thefile['name']));
-									$file->setContentType($content_type);
-									$file->setDescription($this->getParameter($key.'_description'));
-									if (Settings::getUploadStorage() == 'database')
-									{
-										$file->setContent(file_get_contents($files_dir.$new_filename));
-									}
-									$file->save();
-									//$file = TBGFile::createNew($new_filename, basename($thefile['name']), $content_type, $this->getParameter($key.'_description'), ((Settings::getUploadStorage() == 'database') ? file_get_contents($files_dir.$new_filename) : null));
-									if ($apc_exists)
-									{
-										$_SESSION['__upload_status'][$this->getParameter('APC_UPLOAD_PROGRESS')] = array(
-											'id'       => $this->getParameter('APC_UPLOAD_PROGRESS'),
-											'finished' => true,
-											'percent'  => 100,
-											'total'    => 0,
-											'complete' => 0,
-											'file_id'  => $file->getID()
-										);
-									}
-									return $file;
-								}
-							}
-							else
-							{
-								Logging::log('Uploaded file was not uploaded correctly');
-								throw new \Exception(Caspar::getI18n()->__('The file was not uploaded correctly'));
+								Logging::log('Upload complete and ok');
+								return true;
 							}
 						}
 						else
 						{
-							Logging::log('Upload error: '.$thefile['error']);
-							switch ($thefile['error'])
-							{
-								case UPLOAD_ERR_INI_SIZE:
-								case UPLOAD_ERR_FORM_SIZE:
-									throw new \Exception(Caspar::getI18n()->__('You cannot upload files bigger than %max_size% MB', array('%max_size%' => Settings::getUploadsMaxSize())));
-									break;
-								case UPLOAD_ERR_PARTIAL:
-									throw new \Exception(Caspar::getI18n()->__('The upload was interrupted, please try again'));
-									break;
-								case UPLOAD_ERR_NO_FILE:
-									throw new \Exception(Caspar::getI18n()->__('No file was uploaded'));
-									break;
-								default:
-									throw new \Exception(Caspar::getI18n()->__('An unhandled error occured') . ': ' . $thefile['error']);
-									break;
-							}
+							Logging::log('Uploaded file was not uploaded correctly');
+							throw new \Exception(Caspar::getI18n()->__('The file was not uploaded correctly'));
 						}
 					}
 					else
 					{
-						Logging::log('Uploads not enabled');
-						throw new \Exception(Caspar::getI18n()->__('Uploads are not enabled'));
+						Logging::log('Upload error: '.$thefile['error']);
+						switch ($thefile['error'])
+						{
+							case UPLOAD_ERR_INI_SIZE:
+							case UPLOAD_ERR_FORM_SIZE:
+								throw new \Exception(Caspar::getI18n()->__('You cannot upload files bigger than %max_size% MB', array('%max_size%' => Settings::getUploadsMaxSize())));
+								break;
+							case UPLOAD_ERR_PARTIAL:
+								throw new \Exception(Caspar::getI18n()->__('The upload was interrupted, please try again'));
+								break;
+							case UPLOAD_ERR_NO_FILE:
+								throw new \Exception(Caspar::getI18n()->__('No file was uploaded'));
+								break;
+							default:
+								throw new \Exception(Caspar::getI18n()->__('An unhandled error occured') . ': ' . $thefile['error']);
+								break;
+						}
 					}
 					Logging::log('Uploaded file could not be uploaded');
 					throw new \Exception(Caspar::getI18n()->__('The file could not be uploaded'));
@@ -365,7 +279,9 @@
 			foreach ($_FILES as $key => $file)
 			{
 				$this->_files[$key] = $file;
-				$this->_hasfiles = true;
+				if ($file['error'] != UPLOAD_ERR_NO_FILE) {
+					$this->_hasfiles = true;
+				}
 			}
 			//var_dump($this->_request_parameters);die();
 			$this->_is_ajax_call = (array_key_exists("HTTP_X_REQUESTED_WITH", $_SERVER) && mb_strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) == 'xmlhttprequest');
@@ -400,7 +316,7 @@
 		 */		
 		public function getParameters()
 		{
-			return array_diff_key($this->_request_parameters, array('url' => null));;
+			return array_diff_key($this->_request_parameters, array('url' => null));
 		}
 		
 		/**
