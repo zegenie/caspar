@@ -22,15 +22,17 @@
 				</div>
 			</div>
 			<div class="csp-dbg-entry-row-content" id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content" style="display: none;">
-				<ul class="csp-dbg-tab-bar" id="csp-dbg-row-<?php echo $cspdbgrow; ?>1-content-tab">
-					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-1" class="csp-dbg-row-content-tab-selected" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,1);">Summary</li>
-					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-2" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,2);">JSON Output (<?php echo count($dbgjson); ?>)</li>
-					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-3" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,3);">Timings (<?php echo count($dbgpartials); ?>)</li>
-					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-4" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,4);">Caspar log (<?php echo count($dbglog); ?>)</li>
-					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-5" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,5);">Database queries (<?php if (\b2db\Core::isConnected()): echo $dbgquerycount-1; else: echo 'not connected'; endif; ?>)</li>
-					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-6" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,6);">Stored variables (<?php echo count($dbgstored); ?>)</li>
-					<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-7" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,7);">Backtrace</li>
-				</ul>
+				<div class="csp-dbg-tab-bar">
+					<ul id="csp-dbg-row-<?php echo $cspdbgrow; ?>1-content-tab">
+						<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-1" class="csp-dbg-row-content-tab-selected" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,1);">Summary</li>
+						<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-2" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,2);">JSON Output (<?php echo count($dbgjson); ?>)</li>
+						<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-3" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,3);">Timings (<?php echo count($dbgpartials); ?>)</li>
+						<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-4" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,4);">Caspar log (<?php echo count($dbglog); ?>)</li>
+						<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-5" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,5);">Database queries (<?php if (\b2db\Core::isConnected()): echo $dbgquerycount-1; else: echo 'not connected'; endif; ?>)</li>
+						<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-6" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,6);">Stored variables (<?php echo count($dbgstored); ?>)</li>
+						<li id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-7" onClick="cspchangeDebuggerTab(<?php echo $cspdbgrow; ?>,7);">Backtrace</li>
+					</ul>
+				</div>
 				<div class="csp-dbg-tab-panels">
 					<div id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-1-panel" class="csp-dbg-tab-panel">
 						<ul>
@@ -92,9 +94,9 @@
 						<?php $i = 0; ?>
 						<?php foreach ($dbgqueries as $entry): ?>
 							<?php $i++; ?>
-						<div class="csp-dbg-query-title">
-							<span class="csp-dbg-query-title-id">Query <?php echo $i; ?></span> <span class="csp-dbg-query-title-time"><?php echo ($details['time'] >= 1) ? round($details['time'], 2) . ' seconds' : round($details['time'] * 1000, 1) . 'ms'; ?></span> <span class="csp-dbg-query-title-file"> - <?php echo $entry['filename']; ?>:<?php echo $entry['line']; ?></span>
-						</div>
+							<div class="csp-dbg-query-title">
+								<span class="csp-dbg-query-title-id">Query <?php echo $i; ?></span> <span class="csp-dbg-query-title-time"><?php echo ($entry['time'] >= 1) ? round($entry['time'], 2) . ' seconds' : round($entry['time'] * 1000, 1) . 'ms'; ?></span> <span class="csp-dbg-query-title-file"> - <?php echo $entry['filename']; ?>:<?php echo $entry['line']; ?></span>
+							</div>
 						<?php endforeach; ?>
 <?php else: ?>
 						<p><i>Not connected to the database. Ensure the connection parameters are correct on the Summary tab, and run <code>\b2db\Core::doConnect();</code> to connect to the database.</i></p>

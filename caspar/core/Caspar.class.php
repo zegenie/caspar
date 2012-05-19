@@ -414,7 +414,7 @@ class Caspar
 		try {
 			$classname = self::$_configuration['core']['user_classname'];
 			$request = self::getRequest();
-			self::$_user = ($user === null) ? $classname::loginCheck($request->getParameter('csp_username', $request->getCookie('csp_username')), $request->getParameter('csp_password', $request->getCookie('csp_password'))) : $user;
+			self::$_user = ($user === null) ? $classname::loginCheck($request->getParameter('csp_username', $request->getCookie('csp_username')), $request->getParameter('csp_password', $request->getCookie('csp_password')), !$request->hasCookie('csp_password')) : $user;
 			if (self::$_user->isAuthenticated()) {
 				self::getResponse()->setCookie('csp_username', self::$_user->getUsername());
 				self::getResponse()->setCookie('csp_password', self::$_user->getPassword());
@@ -1015,10 +1015,10 @@ class Caspar
 
 		if (self::$_configuration['core']['debug']) {
 			self::$_debug_mode = true;
-			self::autoloadNamespace('al13_debug', \CASPAR_LIB_PATH . DS . 'al13_debug' . DS);
-			require \CASPAR_LIB_PATH . 'al13_debug' . DS . 'bootstrap.php';
 			self::getResponse()->addStylesheet('/css/debugger.css');
 			self::getResponse()->addStylesheet('/css/cspdebugger.css');
+			self::autoloadNamespace('al13_debug\\util', CASPAR_LIB_PATH);
+			require CASPAR_LIB_PATH . 'al13_debug' . DS . 'bootstrap.php';
 			self::$_debugger = new Debugger();
 		} else {
 			self::$_debug_mode = false;

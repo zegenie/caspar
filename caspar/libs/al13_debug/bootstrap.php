@@ -28,7 +28,7 @@ function d() {
         $args = $args[0];
     }
     $debug->dump($args, compact('trace', 'split'));
-};
+}
 
 // Debug dump any amount of variables and then die()
 function dd() {
