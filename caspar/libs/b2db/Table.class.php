@@ -23,6 +23,7 @@
 		protected $b2db_name;
 		protected $id_column;
 		protected $b2db_alias;
+		protected $_cached_entities = array();
 		protected $_columns;
 		protected $_indexes = array();
 		protected $_charset = 'utf8';
@@ -907,6 +908,21 @@
 			list ($criteria, $item_class, $item_column) = $this->generateForeignItemsCriteria($class, $relation_details);
 			$result = $this->doCount($criteria);
 			return $result;
+		}
+
+		public function cacheB2DBObject($id, $object)
+		{
+			$this->_cached_entities[$id] = $object;
+		}
+		
+		public function hasCachedB2DBObject($id)
+		{
+			return array_key_exists($id, $this->_cached_entities);
+		}
+
+		public function getB2DBCachedObject($id)
+		{
+			return $this->_cached_entities[$id];
 		}
 
 	}

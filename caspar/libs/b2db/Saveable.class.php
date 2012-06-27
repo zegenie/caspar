@@ -34,6 +34,15 @@
 			return $b2dbtablename::getTable();
 		}
 
+		public static function getB2DBCachedObjectIfAvailable($id, $classname)
+		{
+			$has_cached = self::getB2DBTable()->hasCachedB2DBObject($id);
+			$object = ($has_cached) ? self::getB2DBTable()->getB2DBCachedObject($id) : new $classname($id);
+			if (!$has_cached) self::getB2DBTable()->cacheB2DBObject($id, $object);
+
+			return $object;
+		}
+
 		protected function _b2dbLazycount($property)
 		{
 			$relation_details = Core::getCachedEntityRelationDetails(\get_class($this), $property);
@@ -46,7 +55,7 @@
 			return $count;
 		}
 
-		protected function _b2dbLazyload($property)
+		protected function _b2dbLazyload($property, $use_cache = true)
 		{
 			$relation_details = Core::getCachedEntityRelationDetails(\get_class($this), $property);
 			if ($relation_details['collection']) {
@@ -61,20 +70,18 @@
 				$value = ($items !== null) ? $items : array();
 				$this->$property = $value;
 			} elseif (is_numeric($this->$property) && $this->$property > 0) {
-				if ($relation_details && \class_exists($relation_details['class']))
-				{
+				if ($relation_details && \class_exists($relation_details['class'])) {
 					$classname = $relation_details['class'];
-					try
-					{
-						$this->$property = new $classname($this->$property);
-					}
-					catch (\Exception $e)
-					{
+					try {
+						if (!$use_cache) {
+							$this->$property = new $classname($this->$property);
+						} else {
+							$this->$property = $classname::getB2DBCachedObjectIfAvailable($this->$property, $classname);
+						}
+					} catch (\Exception $e) {
 						$this->$property = null;
 					}
-				}
-				else
-				{
+				} else {
 					throw new \Exception("Unknown class definition for property {$property} in class ".\get_class($this));
 				}
 			}
