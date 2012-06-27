@@ -435,9 +435,11 @@
 		 * 
 		 * @return bool
 		 */
-		public function setCookie($key, $value, $expiration = 864000)
+		public function setCookie($key, $value, $expiration = 864000, $base_path = null, $domain = null)
 		{
-			setcookie($key, $value, NOW + $expiration, Caspar::getBaseURL());
+			$base_path = ($base_path !== null) ? $base_path : Caspar::getBasePath();
+			$domain = ($domain !== null) ? $domain : Caspar::getBaseURL();
+			setcookie($key, $value, NOW + $expiration, Caspar::getBasePath());
 			return true;
 		}
 		
@@ -448,9 +450,9 @@
 		 * 
 		 * @return bool
 		 */
-		public function deleteCookie($key)
+		public function deleteCookie($key, $base_path = null, $domain = null)
 		{
-			setcookie($key, '', NOW - 36000, Caspar::getBaseURL());
+			setcookie($key, '', NOW - 36000);
 			return true;
 		}		
 

@@ -25,7 +25,7 @@
 		$params['src'] = $image;
 
 		if (!$relative) {
-			$params['src'] = \caspar\core\Caspar::getBaseURL() . $params['src'];
+			$params['src'] = \caspar\core\Caspar::getBasePath() . $params['src'];
 		}
 		if (!array_key_exists('alt', $params) || !$params['alt']) {
 			$params['alt'] = $image;

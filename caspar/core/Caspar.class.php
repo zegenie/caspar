@@ -256,13 +256,23 @@ class Caspar
 	}
 
 	/**
-	 * Get the subdirectory part of the url
+	 * Get the top level url
 	 * 
 	 * @return string
 	 */
 	public static function getBaseURL()
 	{
-		return self::$_configuration['core']['url'];
+		return self::$_configuration['core']['base_url'];
+	}
+
+	/**
+	 * Get the subdirectory part of the url
+	 *
+	 * @return string
+	 */
+	public static function getBasePath()
+	{
+		return self::$_configuration['core']['base_path'];
 	}
 
 	/**

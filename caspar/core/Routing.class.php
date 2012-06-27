@@ -509,11 +509,10 @@
 			}
 			if (!$relative)
 			{
-				return Caspar::getBaseURL() . $real_url;
+				return Caspar::getBasePath() . $real_url;
 			}
 			return $real_url;
 		}
-		
 		
 		// code from php at moechofe dot com (array_merge comment on php.net)
 		/*
