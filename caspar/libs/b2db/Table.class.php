@@ -67,7 +67,7 @@
 		/**
 		 * Return an instance of this table
 		 * 
-		 * @return Table 
+		 * @return \b2db\Table
 		 */
 		public static function getTable()
 		{
@@ -335,8 +335,13 @@
 		 */
 		public function selectById($id, Criteria $crit = null, $join = 'all')
 		{
-			$row = $this->doSelectById($id, $crit, $join);
-			return $this->_populateFromRow($row);
+			if (!$this->hasCachedB2DBObject($id)) {
+				$row = $this->doSelectById($id, $crit, $join);
+				$object = $this->_populateFromRow($row);
+			} else {
+				$object = $this->getB2DBCachedObject($id);
+			}
+			return $object;
 		}
 
 		/**
@@ -817,7 +822,7 @@
 
 				$id_column = ($id_column !== null) ? $id_column : $row->getCriteria()->getTable()->getIdColumn();
 				$row_id = $row->get($id_column);
-				$item = new $classname($row_id, $row);
+				$item = $classname::getB2DBCachedObjectIfAvailable($row_id, $classname, $row);
 			}
 			return $item;
 		}

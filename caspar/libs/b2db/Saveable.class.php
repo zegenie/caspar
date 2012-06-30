@@ -34,10 +34,10 @@
 			return $b2dbtablename::getTable();
 		}
 
-		public static function getB2DBCachedObjectIfAvailable($id, $classname)
+		public static function getB2DBCachedObjectIfAvailable($id, $classname, $row = null)
 		{
 			$has_cached = self::getB2DBTable()->hasCachedB2DBObject($id);
-			$object = ($has_cached) ? self::getB2DBTable()->getB2DBCachedObject($id) : new $classname($id);
+			$object = ($has_cached) ? self::getB2DBTable()->getB2DBCachedObject($id) : new $classname($id, $row);
 			if (!$has_cached) self::getB2DBTable()->cacheB2DBObject($id, $object);
 
 			return $object;
@@ -213,6 +213,7 @@
 					$this->_id = (integer) $id;
 					$this->_populatePropertiesFromRow($row, $traverse, $foreign_key);
 					$this->_construct($row, $foreign_key);
+					$this->getB2DBTable()->cacheB2DBObject($id, $this);
 				}
 				catch (\Exception $e)
 				{
@@ -237,6 +238,9 @@
 			$this->_preSave($is_new);
 			$res_id = self::getB2DBTable()->saveObject($this);
 			$this->_id = $res_id;
+			if ($is_new) {
+				$this->getB2DBTable()->cacheB2DBObject($res_id, $this);
+			}
 			$this->_postSave($is_new);
 		}
 		
