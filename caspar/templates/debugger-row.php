@@ -66,13 +66,15 @@
 					</div>
 					<div id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-2-panel" class="csp-dbg-tab-panel" style="display: none;">
 						<?php if (!$csp_debugger->isAjaxRequest()): ?>
-						<p><i>This tab only applies to AJAX requests.</i></p>
+							<p><i>This tab only applies to AJAX requests.</i></p>
 						<?php else: ?>
-						<p><i>This is a list of all items in any JSON output from the call. If this list is empty, the AJAX request has not used JSON.</i></p>
-						<?php foreach ($dbgjson as $field => $value): ?>
-						<div class="csp-dbg-json-field"><?php echo $field; ?></div>
-						<pre class="csp-dbg-json-value"><?php echo $value; ?></pre>
-						<?php endforeach; ?>
+							<p><i>This is a list of all items in any JSON output from the call. If this list is empty, the AJAX request has not used JSON.</i></p>
+							<?php if (is_array($dbgjson)): ?>
+								<?php foreach ($dbgjson as $field => $value): ?>
+								<div class="csp-dbg-json-field"><?php echo $field; ?></div>
+								<pre class="csp-dbg-json-value"><?php echo $value; ?></pre>
+								<?php endforeach; ?>
+							<?php endif; ?>
 						<?php endif; ?>
 					</div>
 					<div id="csp-dbg-row-<?php echo $cspdbgrow; ?>-content-tab-3-panel" class="csp-dbg-tab-panel" style="display: none;">
