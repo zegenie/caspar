@@ -124,10 +124,17 @@
 		 */
 		protected $_decor_footer = null;
 
-		public function __construct($javascripts = array(), $stylesheets = array())
+		/**
+		 * Base URL
+		 * @var string
+		 */
+		protected $_base_url = null;
+
+		public function __construct($javascripts = array(), $stylesheets = array(), $url = null)
 		{
 			$this->_javascripts = $javascripts;
 			$this->_stylesheets = $stylesheets;
+			$this->_base_url = $url;
 		}
 		
 		public function ajaxResponseText($code, $error)
@@ -552,5 +559,10 @@
 		{
 			return $this->_favicon_url;
 		}
+
+ 		public function getBaseURL()
+ 		{
+ 			return $this->_base_url;
+ 		}
 
 	}
