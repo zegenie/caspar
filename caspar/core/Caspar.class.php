@@ -393,7 +393,7 @@ class Caspar
 		if (!is_object(self::$_response)) {
 			if (is_array(self::$_configuration) && array_key_exists('core', self::$_configuration)) {
 				$classname = self::$_configuration['core']['response_classname'];
-				self::$_response = new $classname(self::$_configuration['core']['javascripts'], self::$_configuration['core']['stylesheets']);
+				self::$_response = new $classname(self::$_configuration['core']['javascripts'], self::$_configuration['core']['stylesheets'], self::$_configuration['core']['url']);
 			} else {
 				return new Response();
 			}
@@ -1025,8 +1025,8 @@ class Caspar
 
 		if (self::$_configuration['core']['debug']) {
 			self::$_debug_mode = true;
-			self::getResponse()->addStylesheet('/css/debugger.css');
-			self::getResponse()->addStylesheet('/css/cspdebugger.css');
+			self::getResponse()->addStylesheet('/debugger.css');
+			self::getResponse()->addStylesheet('/cspdebugger.css');
 			self::autoloadNamespace('al13_debug\\util', CASPAR_LIB_PATH . 'al13_debug' . DS . 'util' . DS);
 			require CASPAR_LIB_PATH . 'al13_debug' . DS . 'bootstrap.php';
 			self::$_debugger = new Debugger();
