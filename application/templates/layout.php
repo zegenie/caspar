@@ -9,11 +9,11 @@
 			<link rel="alternate" type="application/rss+xml" title="<?php echo str_replace('"', '\'', $feed_title); ?>" href="<?php echo $feed_url; ?>">
 		<?php endforeach; ?>
 		<?php foreach ($csp_response->getStylesheets() as $css): ?>
-			<link rel="stylesheet" href="<?php echo $css; ?>">
+			<link rel="stylesheet" href="<?php echo $csp_response->getBaseURL().'css/'.$css; ?>">
 		<?php endforeach; ?>
 
 		<?php foreach ($csp_response->getJavascripts() as $js): ?>
-			<script type="text/javascript" src="<?php echo $js; ?>"></script>
+			<script type="text/javascript" src="<?php echo $csp_response->getBaseURL().'js/'.$js; ?>"></script>
 		<?php endforeach; ?>
 		  <!--[if lt IE 9]>
 			  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
