@@ -1,7 +1,8 @@
 # Caspar configuration
 
 core:
-  url: "http://caspar.l/"
+  base_url: "http://caspar.l"
+  base_path: "/"
   modules: ['main', 'b2db']
   language: 'en_US'
   debug: true
