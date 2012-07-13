@@ -193,7 +193,7 @@
 		 */
 		public function renderTemplate($template, $params = array())
 		{
-			echo \caspar\core\ActionComponents::includeTemplate($template, $params);
+			echo \caspar\core\Components::includeTemplate($template, $params);
 			return true;
 		}
 
@@ -207,7 +207,7 @@
 		 */
 		public function renderComponent($template, $params = array())
 		{
-			echo \caspar\core\ActionComponents::includeComponent($template, $params);
+			echo \caspar\core\Components::includeComponent($template, $params);
 			return true;
 		}
 
