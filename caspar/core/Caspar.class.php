@@ -872,6 +872,11 @@ class Caspar
 		return $processUser['name'];
 	}
 
+	public static function setDebugMode($mode = true)
+	{
+		self::$_debug_mode = $mode;
+	}
+
 	public static function isDebugMode()
 	{
 		return self::$_debug_mode;
