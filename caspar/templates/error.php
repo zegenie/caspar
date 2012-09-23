@@ -42,75 +42,80 @@ body { background-color: #DFDFDF; font-family: sans-serif; font-size: 13px; }
 </head>
 <body>
 	<div class="rounded_box" style="margin: 30px auto 30px auto; width: 700px;">
-		<h1>An error occured in Caspar</h1>
-		<div class="error_content">
-			<h2><?php echo (isset($exception)) ? $exception->getMessage() : $error; ?></h2>
-			<?php if (isset($exception) && $exception instanceof \Exception): ?>
-				<?php if ($exception instanceof ActionNotFoundException): ?>
-					<h3>Could not find the specified action</h3>
-				<?php elseif ($exception instanceof TemplateNotFoundException): ?>
-					<h3>Could not find the template file for the specified action</h3>
-				<?php elseif ($exception instanceof \b2db\Exception): ?>
-					<h3>An exception was thrown in the B2DB framework</h3>
+		<?php if (!Caspar::isDebugMode()): ?>
+			<h1>Woops! An error occured</h1>
+			Go back to the <a href="<?php echo make_url('home'); ?>">frontpage</a>?
+		<?php else: ?>
+			<h1>An error occured in Caspar</h1>
+			<div class="error_content">
+				<h2><?php echo (isset($exception)) ? $exception->getMessage() : $error; ?></h2>
+				<?php if (isset($exception) && $exception instanceof \Exception): ?>
+					<?php if ($exception instanceof ActionNotFoundException): ?>
+						<h3>Could not find the specified action</h3>
+					<?php elseif ($exception instanceof TemplateNotFoundException): ?>
+						<h3>Could not find the template file for the specified action</h3>
+					<?php elseif ($exception instanceof \b2db\Exception): ?>
+						<h3>An exception was thrown in the B2DB framework</h3>
+					<?php else: ?>
+						<h3>An unhandled exception occurred:</h3>
+					<?php endif; ?>
+					<span style="color: #55F;"><?php echo $exception->getFile(); ?></span>, line <b><?php echo $exception->getLine(); ?></b>:<br>
+					<i><?php echo $exception->getMessage(); ?></i>
 				<?php else: ?>
-					<h3>An unhandled exception occurred:</h3>
+					<?php if ($code == 8): ?>
+						<h3>The following notice has stopped further execution:</h3>
+					<?php else: ?>
+						<h3>The following error occured:</h3>
+					<?php endif; ?>
+					<i><?php echo $error; ?></i> in <span style="color: #55F;"><?php echo $file; ?></span>, line <?php echo $line; ?>
 				<?php endif; ?>
-				<span style="color: #55F;"><?php echo $exception->getFile(); ?></span>, line <b><?php echo $exception->getLine(); ?></b>:<br>
-				<i><?php echo $exception->getMessage(); ?></i>
-			<?php else: ?>
-				<?php if ($code == 8): ?>
-					<h3>The following notice has stopped further execution:</h3>
-				<?php else: ?>
-					<h3>The following error occured:</h3>
+				<br>
+				<?php if (class_exists("\\caspar\core\Caspar") && self::isDebugMode()): ?>
+					<h3>Stack trace:</h3>
+					<ul>
+						<?php $trace = (isset($exception)) ? $exception->getTrace() : debug_backtrace(); ?>
+						<?php foreach ($trace as $trace_element): ?>
+							<?php if (array_key_exists('class', $trace_element) && $trace_element['class'] == 'caspar\core\Caspar' && array_key_exists('function', $trace_element) && in_array($trace_element['function'], array('errorHandler', 'exceptionHandler'))) continue; ?>
+							<li>
+							<?php if (array_key_exists('class', $trace_element)): ?>
+								<strong><?php echo $trace_element['class'].$trace_element['type'].$trace_element['function']; ?>()</strong>
+							<?php elseif (array_key_exists('function', $trace_element)): ?>
+								<strong><?php echo $trace_element['function']; ?>()</strong>
+							<?php else: ?>
+								<strong>unknown function</strong>
+							<?php endif; ?>
+							<br>
+							<?php if (array_key_exists('file', $trace_element)): ?>
+								<span style="color: #55F;"><?php echo $trace_element['file']; ?></span>, line <?php echo $trace_element['line']; ?>
+							<?php else: ?>
+								<span style="color: #C95;">unknown file</span>
+							<?php endif; ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
 				<?php endif; ?>
-				<i><?php echo $error; ?></i> in <span style="color: #55F;"><?php echo $file; ?></span>, line <?php echo $line; ?>
-			<?php endif; ?>
-			<br>
-			<?php if (class_exists("\\caspar\core\Caspar") && self::isDebugMode()): ?>
-				<h3>Stack trace:</h3>
-				<ul>
-					<?php $trace = (isset($exception)) ? $exception->getTrace() : debug_backtrace(); ?>
-					<?php foreach ($trace as $trace_element): ?>
-						<?php if (array_key_exists('class', $trace_element) && $trace_element['class'] == 'caspar\core\Caspar' && array_key_exists('function', $trace_element) && in_array($trace_element['function'], array('errorHandler', 'exceptionHandler'))) continue; ?>
-						<li>
-						<?php if (array_key_exists('class', $trace_element)): ?>
-							<strong><?php echo $trace_element['class'].$trace_element['type'].$trace_element['function']; ?>()</strong>
-						<?php elseif (array_key_exists('function', $trace_element)): ?>
-							<strong><?php echo $trace_element['function']; ?>()</strong>
-						<?php else: ?>
-							<strong>unknown function</strong>
-						<?php endif; ?>
-						<br>
-						<?php if (array_key_exists('file', $trace_element)): ?>
-							<span style="color: #55F;"><?php echo $trace_element['file']; ?></span>, line <?php echo $trace_element['line']; ?>
-						<?php else: ?>
-							<span style="color: #C95;">unknown file</span>
-						<?php endif; ?>
-						</li>
+				<?php if (class_exists("\\caspar\core\Caspar") && class_exists("\\caspar\core\Logging") && self::isDebugMode()): ?>
+					<h3>Log messages:</h3>
+					<?php foreach (\caspar\core\Logging::getEntries() as $entry): ?>
+						<?php $color = \caspar\core\Logging::getCategoryColor($entry['category']); ?>
+						<?php $lname = \caspar\core\Logging::getLevelName($entry['level']); ?>
+						<div class="log_<?php echo $entry['category']; ?>"><strong><?php echo $lname; ?></strong> <strong style="color: #<?php echo $color; ?>">[<?php echo $entry['category']; ?>]</strong> <span style="color: #555; font-size: 10px; font-style: italic;"><?php echo $entry['time']; ?></span>&nbsp;&nbsp;<?php echo $entry['message']; ?></div>
 					<?php endforeach; ?>
-				</ul>
-			<?php endif; ?>
-			<?php if (class_exists("\\caspar\core\Caspar") && class_exists("\\caspar\core\Logging") && self::isDebugMode()): ?>
-				<h3>Log messages:</h3>
-				<?php foreach (\caspar\core\Logging::getEntries() as $entry): ?>
-					<?php $color = \caspar\core\Logging::getCategoryColor($entry['category']); ?>
-					<?php $lname = \caspar\core\Logging::getLevelName($entry['level']); ?>
-					<div class="log_<?php echo $entry['category']; ?>"><strong><?php echo $lname; ?></strong> <strong style="color: #<?php echo $color; ?>">[<?php echo $entry['category']; ?>]</strong> <span style="color: #555; font-size: 10px; font-style: italic;"><?php echo $entry['time']; ?></span>&nbsp;&nbsp;<?php echo $entry['message']; ?></div>
-				<?php endforeach; ?>
-			<?php endif; ?>
-			<?php if (class_exists("\b2db\Core") && self::isDebugMode()): ?>
-				<h3>SQL queries:</h3>
-					<ol>
-					<?php foreach (\b2db\Core::getSQLHits() as $details): ?>
-						<li>
-							<span class="faded_out dark small"><b>[<?php echo ($details['time'] >= 1) ? round($details['time'], 2) . ' seconds' : round($details['time'] * 1000, 1) . 'ms'; ?>]</b></span>
-							from <b><?php echo $details['filename']; ?>, line <?php echo $details['line']; ?></b>:<br>
-							<span style="font-size: 12px;"><?php echo $details['sql']; ?></span>
-						</li>
-					<?php endforeach; ?>
-					</ol>
-			<?php endif; ?>
-		</div>
+				<?php endif; ?>
+				<?php if (class_exists("\b2db\Core") && self::isDebugMode()): ?>
+					<h3>SQL queries:</h3>
+						<ol>
+						<?php foreach (\b2db\Core::getSQLHits() as $details): ?>
+							<li>
+								<span class="faded_out dark small"><b>[<?php echo ($details['time'] >= 1) ? round($details['time'], 2) . ' seconds' : round($details['time'] * 1000, 1) . 'ms'; ?>]</b></span>
+								from <b><?php echo $details['filename']; ?>, line <?php echo $details['line']; ?></b>:<br>
+								<span style="font-size: 12px;"><?php echo $details['sql']; ?></span>
+							</li>
+						<?php endforeach; ?>
+						</ol>
+				<?php endif; ?>
+			</div>
+		<?php endif; ?>
 	</div>
 </body>
 </html>
