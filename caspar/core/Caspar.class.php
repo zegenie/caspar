@@ -1138,10 +1138,10 @@ class Caspar
 
 		Logging::log((Cache::isInMemorycacheEnabled()) ? 'APC cache is enabled' : 'APC cache is not enabled');
 
+		require CASPAR_APPLICATION_PATH . 'bootstrap.inc.php';
+
 		self::loadConfiguration();
 		self::initializeServices();
-
-		require CASPAR_APPLICATION_PATH . 'bootstrap.inc.php';
 
 		self::loadRoutes();
 
