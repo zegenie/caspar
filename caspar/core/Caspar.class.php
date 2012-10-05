@@ -266,6 +266,26 @@ class Caspar
 	}
 
 	/**
+	 * Get the cookie domain
+	 *
+	 * @return string
+	 */
+	public static function getDefaultCookieDomain()
+	{
+		return self::$_configuration['core']['cookie_domain'];
+	}
+
+	/**
+	 * Get the cookie base path
+	 *
+	 * @return string
+	 */
+	public static function getDefaultCookiePath()
+	{
+		return self::$_configuration['core']['cookie_path'];
+	}
+
+	/**
 	 * Get the subdirectory part of the url
 	 *
 	 * @return string

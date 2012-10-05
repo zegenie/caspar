@@ -1,14 +1,17 @@
 # Caspar configuration
 
 core:
-  base_url: "http://caspar.l"
+  base_url: "caspar.l"
   base_path: "/"
+  cookie_domain: "caspar.l"
+  cookie_path: "/"
   modules: ['main', 'b2db']
   language: 'en_US'
   debug: true
   site_name: 'Caspar sample application'
   stylesheets: []
   javascripts: ['prototype', 'scriptaculous']
+  salt: 5DsIFX9SrMloZxvUnhdpZC
   user_classname: \caspar\core\User
   response_classname: \caspar\core\Response
 

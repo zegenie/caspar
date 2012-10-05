@@ -444,9 +444,9 @@
 		 */
 		public function setCookie($key, $value, $expiration = 864000, $base_path = null, $domain = null)
 		{
-			$base_path = ($base_path !== null) ? $base_path : Caspar::getBasePath();
-			$domain = ($domain !== null) ? $domain : Caspar::getBaseURL();
-			setcookie($key, $value, NOW + $expiration, Caspar::getBasePath());
+			$base_path = ($base_path !== null) ? $base_path : Caspar::getDefaultCookiePath();
+			$domain = ($domain !== null) ? $domain : Caspar::getDefaultCookieDomain();
+			setcookie($key, $value, NOW + $expiration, $base_path, $domain);
 			return true;
 		}
 		
