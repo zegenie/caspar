@@ -150,6 +150,8 @@
 		
 		protected function _preInitialize() {}
 		
+		protected function _postInitialize() {}
+
 		protected function _construct(\b2db\Row $row, $foreign_key = null) {}
 
 		protected function _clone() {}
@@ -213,6 +215,7 @@
 					$this->_id = (integer) $id;
 					$this->_populatePropertiesFromRow($row, $traverse, $foreign_key);
 					$this->_construct($row, $foreign_key);
+					$this->_postInitialize();
 					$this->getB2DBTable()->cacheB2DBObject($id, $this);
 				}
 				catch (\Exception $e)
