@@ -459,7 +459,8 @@
 		 */
 		public function deleteCookie($key, $base_path = null, $domain = null)
 		{
-			setcookie($key, '', NOW - 36000);
+			$domain = ($domain !== null) ? $domain : '.'.Caspar::getDefaultCookieDomain();
+			$this->setCookie($key, '', NOW - 36000, $base_path, $domain);
 			return true;
 		}		
 
