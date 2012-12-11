@@ -59,7 +59,7 @@
 			if (!file_exists($template_name))
 			{
 				if (!$throw_exceptions) return false;
-				throw new TBGTemplateNotFoundException("The template file <b>_{$module_file['file']}.inc.php</b> cannot be found in the template directory for module \"" . Caspar::getRouting()->getCurrentRouteModule() . '"');
+				throw new TemplateNotFoundException("The template file <b>_{$module_file['file']}.inc.php</b> cannot be found in the template directory for module \"" . Caspar::getRouting()->getCurrentRouteModule() . '"');
 			}
 			if (!$throw_exceptions) return true;
 
@@ -169,22 +169,22 @@
 			if (array_key_exists('val', $params)) $val = $params['val'];
 			
 			/**
-			 * @global TBGRequest The request object
+			 * @global Request The request object
 			 */
 			$csp_request = Caspar::getRequest();
 			
 			/**
-			 * @global TBGResponse The response object
+			 * @global Response The response object
 			 */
 			$csp_response = Caspar::getResponse();
 			
 			/**
-			 * @global TBGRequest The request object
+			 * @global Request The request object
 			 */
 			$csp_routing = Caspar::getRouting();
 			
 			/**
-			 * @global TBGUser The user object
+			 * @global User The user object
 			 */
 			$csp_user = Caspar::getUser();
 
