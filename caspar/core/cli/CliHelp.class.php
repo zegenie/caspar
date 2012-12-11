@@ -1,6 +1,6 @@
 <?php
 
-namespace caspar\cli;
+	namespace caspar\core\cli;
 
 	/**
 	 * CLI command class, caspar -> help

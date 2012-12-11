@@ -9,6 +9,7 @@
 	// Set standard constants needed elsewhere
 	defined('DS') || define('DS', DIRECTORY_SEPARATOR);
 	defined('CASPAR_PATH') || define('CASPAR_PATH', realpath(getcwd() . DS) . DS . 'caspar' . DS);
+	defined('CASPAR_APPLICATION_PATH') || define('CASPAR_APPLICATION_PATH', realpath(getcwd() . DS) . DS . 'application' . DS);
 
 	try
 	{
@@ -33,31 +34,29 @@
 		{
 			if (file_exists($fileinfo->getPathname() . DS . 'cli'))
 			{
-				$command_paths['application\\'.$fileinfo->getFilename()] = $fileinfo->getPathname() . DS . 'cli';
+				$command_paths[$fileinfo->getFilename()] = $fileinfo->getPathname() . DS . 'cli';
 			}
 		}
 	}
 
 	// Set up all cli commands
-	foreach ($command_paths as $namespace_name => $command_path)
+	foreach ($command_paths as $module_name => $command_path)
 	{
-		caspar\core\Caspar::autoloadNamespace($namespace_name.'\\cli', $command_path);
+		caspar\core\Caspar::autoloadNamespace('application\\modules\\'.$module_name.'\\cli', $command_path);
 		$_path_handle = opendir($command_path);
 		while ($command_class_file = readdir($_path_handle))
 		{
 			if (($classname = substr($command_class_file, 0, strpos($command_class_file, '.'))) != '')
 			{
-				$finalname = $namespace_name.'\\cli\\'.$classname;
+				$finalname = ($module_name == 'caspar') ? '\\caspar\\core\\cli\\'.$classname : 'application\\modules\\'.$module_name.'\\cli\\'.$classname;
 
-				$namespace_name = preg_replace('/^application\\\/i', '', $namespace_name);
-
-				$command = new $finalname($namespace_name);
+				$command = new $finalname($module_name);
 				if ($command instanceof caspar\core\CliCommand)
 				{
-					$commands[$namespace_name][$command->getCommandName()] = $command;
+					$commands[$module_name][$command->getCommandName()] = $command;
 					foreach ($command->getCommandAliases() as $alias)
 					{
-						$commands[$namespace_name][$alias] = $command;
+						$commands[$module_name][$alias] = $command;
 					}
 				}
 			}
