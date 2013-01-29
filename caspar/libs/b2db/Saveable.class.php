@@ -23,6 +23,8 @@
 	class Saveable
 	{
 
+		protected $_b2db_initial_values = array();
+
 		/**
 		 * Return the associated B2DBTable for this class
 		 * 
@@ -125,6 +127,9 @@
 				}
 				switch ($property_type)
 				{
+					case 'serializable':
+						$this->$property_name = unserialize($row->get($column['name'], $foreign_key));
+						break;
 					case 'class':
 						$value = (int) $row->get($column['name']);
 						$this->$property_name = new $type_name($value, $row, false, $column['name']);
@@ -192,6 +197,15 @@
 			return $this->$property_name;
 		}
 
+		protected function _b2dbResetInitialValues()
+		{
+			foreach ($this->getB2DBTable()->getColumns() as $column) {
+				$property = mb_strtolower($column['property']);
+				$value = $this->getB2DBSaveablePropertyValue($property);
+				$this->_b2db_initial_values[$property] = $value;
+			}
+		}
+
 		final public function __construct($id = null, $row = null, $traverse = true, $foreign_key = null)
 		{
 			if ($id != null)
@@ -212,11 +226,13 @@
 				try
 				{
 					$this->_preInitialize();
+					$table = $this->getB2DBTable();
 					$this->_id = (integer) $id;
 					$this->_populatePropertiesFromRow($row, $traverse, $foreign_key);
+					$this->_b2dbResetInitialValues();
 					$this->_construct($row, $foreign_key);
 					$this->_postInitialize();
-					$this->getB2DBTable()->cacheB2DBObject($id, $this);
+					$table->cacheB2DBObject($id, $this);
 				}
 				catch (\Exception $e)
 				{
@@ -235,11 +251,17 @@
 			$this->_clone();
 		}
 
+		final public function isB2DBValueChanged($property)
+		{
+			return $this->_b2db_initial_values[$property] !== $this->getB2DBSaveablePropertyValue($property);
+		}
+
 		final public function save()
 		{
 			$is_new = !(bool) $this->_id;
 			$this->_preSave($is_new);
 			$res_id = self::getB2DBTable()->saveObject($this);
+			$this->_b2dbResetInitialValues();
 			$this->_id = $res_id;
 			if ($is_new) {
 				$this->getB2DBTable()->cacheB2DBObject($res_id, $this);

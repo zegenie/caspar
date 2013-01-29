@@ -44,7 +44,9 @@ body { background-color: #DFDFDF; font-family: sans-serif; font-size: 13px; }
 	<div class="rounded_box" style="margin: 30px auto 30px auto; width: 700px;">
 		<?php if (!Caspar::isDebugMode()): ?>
 			<h1>Woops! An error occured</h1>
-			Go back to the <a href="<?php echo make_url('home'); ?>">frontpage</a>?
+			<div style="padding: 10px;">
+				Go back to the <a href="http://www.thebuggenie.com">frontpage</a>?
+			</div>
 		<?php else: ?>
 			<h1>An error occured in Caspar</h1>
 			<div class="error_content">

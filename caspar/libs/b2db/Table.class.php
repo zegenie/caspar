@@ -593,9 +593,11 @@
 			return $crit;
 		}
 		
-		protected function formatify($value, $type)
+		public function formatify($value, $type)
 		{
 			switch ($type) {
+				case 'serializable':
+					return serialize($value);
 				case 'float':
 					return ($value) ? \settype(\gmp_strval($value)) : $value;
 				case 'varchar':
@@ -614,6 +616,7 @@
 		{
 			$crit = $this->getCriteria();
 			$id = $object->getB2DBID();
+			$changed = false;
 			foreach ($this->getColumns() as $column) {
 				if (!array_key_exists('property', $column)) {
 					throw new Exception('Could not match all columns to properties for object of type '.\get_class($object).". Make sure you're not mixing between initializing the table manually and using column (property) annotations");
@@ -621,16 +624,20 @@
 				$property = $column['property'];
 				$value = $this->formatify($object->getB2DBSaveablePropertyValue(mb_strtolower($property)), $column['type']);
 				if ($column['name'] == $this->getIdColumn()) $res_id = $value;
+				if ($id && !$object->isB2DBValueChanged($property)) continue;
 				if (is_object($value)) $value = (int) $value->getID();
 				if (in_array($column['name'], $this->_foreigncolumns)) $value = ($value) ? (int) $value : null;
 				if ($id) {
+					$changed = true;
 					$crit->addUpdate($column['name'], $value);
 				} elseif ($column != $this->getIdColumn()) {
 					$crit->addInsert($column['name'], $value);
 				}
 			}
 			if ($id) {
-				$res = $this->doUpdateById($crit, $id);
+				if ($changed) {
+					$res = $this->doUpdateById($crit, $id);
+				}
 				$res_id = $id;
 			} else {
 				$res = $this->doInsert($crit);
@@ -660,6 +667,7 @@
 					if ($column['unsigned'] && Core::getDBtype() != 'pgsql') $fsql .= ' UNSIGNED';
 					break;
 				case 'varchar':
+				case 'serializable':
 					if (!$column['length']) throw new Exception("Column '{$column['name']}' (defined in ".\get_class($this).") is missing required 'length' property");
 					$fsql .= 'VARCHAR(' . $column['length'] . ')';
 					break;

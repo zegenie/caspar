@@ -8,13 +8,15 @@
 
 	// Set standard constants needed elsewhere
 	defined('DS') || define('DS', DIRECTORY_SEPARATOR);
-	defined('CASPAR_PATH') || define('CASPAR_PATH', realpath(getcwd() . DS) . DS . 'caspar' . DS);
-	defined('CASPAR_APPLICATION_PATH') || define('CASPAR_APPLICATION_PATH', realpath(getcwd() . DS) . DS . 'application' . DS);
+	defined('CASPAR_PATH') || define('CASPAR_PATH', realpath(__DIR__ . DS . '..' . DS) . DS);
+	defined('CASPAR_APPLICATION_PATH') || define('CASPAR_APPLICATION_PATH', realpath(__DIR__ . DS . '..' . DS . '..' . DS) . DS . 'application' . DS);
 
 	try
 	{
 		// Include the "engine" script, which initializes and sets up stuff
 		require CASPAR_PATH . 'bootstrap.inc.php';
+		require CASPAR_APPLICATION_PATH . 'bootstrap.inc.php';
+		caspar\core\Caspar::initialize();
 	}
 	catch (Exception $e)
 	{

@@ -834,6 +834,10 @@
 						$column_name = $column_prefix . (($column_annotation->hasProperty('name')) ? $column_annotation->getProperty('name') : substr($property_name, 1));
 						$column = array('property' => $property_name, 'default_value' => (($column_annotation->hasProperty('default_value')) ? $column_annotation->getProperty('default_value') : null), 'not_null' => (($column_annotation->hasProperty('not_null')) ? $column_annotation->getProperty('not_null') : false), 'name' => $column_name, 'type' => $column_annotation->getProperty('type'));
 						switch ($column['type']) {
+							case 'serializable':
+								$column['type'] = 'serializable';
+								$column['length'] = ($column_annotation->hasProperty('length')) ? $column_annotation->getProperty('length') : null;
+								break;
 							case 'varchar':
 							case 'string':
 								$column['type'] = 'varchar';

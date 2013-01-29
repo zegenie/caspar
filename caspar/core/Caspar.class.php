@@ -208,6 +208,7 @@ class Caspar
 					$classpath = (count($orig_class_details)) ? join(DS, $orig_class_details) . DS : '';
 					$basepath = $namespaces[$namespace];
 					$filename = $basepath . DS . $classpath . $classname_element . '.class.php';
+					$filename_unprefixed = $basepath . DS . $classpath . $classname_element . '.php';
 					$filename_alternate = $basepath . DS . $classpath . "classes" . DS . $classname_element . ".class.php";
 					break;
 				}
@@ -218,6 +219,7 @@ class Caspar
 			foreach ($namespaces[0] as $classpath) {
 				if (file_exists($classpath . DS . $classname . '.class.php')) {
 					$filename = $classpath . DS . $classname . '.class.php';
+					$filename_unprefixed = $classpath . DS . $classname . '.php';
 					$filename_alternate = $classpath . DS . 'classes' . DS . $classname . '.class.php';
 					break;
 				}
@@ -225,6 +227,9 @@ class Caspar
 		}
 		if (isset($filename) && file_exists($filename)) {
 			require $filename;
+			return;
+		} elseif (isset($filename_unprefixed) && file_exists($filename_unprefixed)) {
+			require $filename_unprefixed;
 			return;
 		} elseif (isset($filename_alternate) && file_exists($filename_alternate)) {
 			require $filename_alternate;
@@ -1168,7 +1173,8 @@ class Caspar
 		Logging::log('Caspar framework loaded');
 		$event = Event::createNew('caspar/core', 'post_initialize')->trigger();
 
-		self::go();
+		if (!self::isCLI())
+			self::go();
 	}
 
 	public static function setEnvironment($environment)
@@ -1201,6 +1207,11 @@ class Caspar
 		return self::$_configuration['core']['salt'];
 	}
 
+	/**
+	 * Return the debugger instance
+	 *
+	 * @return Debugger
+	 */
 	public static function getDebugger()
 	{
 		return self::$_debugger;
