@@ -1207,6 +1207,13 @@ class Caspar
 		return self::$_configuration['core']['salt'];
 	}
 
+    public static function getConfiguration($section, $key = null)
+    {
+        if (!array_key_exists($section, self::$_configuration)) return ($key !== null) ? null : array();
+
+        return (array_key_exists($key, self::$_configuration[$section])) ? self::$_configuration[$section][$key] : null;
+    }
+
 	/**
 	 * Return the debugger instance
 	 *

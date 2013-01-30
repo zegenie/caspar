@@ -59,7 +59,7 @@
 	top: 0;
 	left: 0;
 	position: fixed;
-	z-index: 10000;
+	z-index: 9999999;
 }
 
 #csp-dbg-title {
@@ -91,8 +91,8 @@
 	border-top: 1px solid #555555;
 	border-bottom: 1px solid black;
 	color: white;
-	font-size: 20px;
-	padding: 10px;
+	font-size: 13px;
+	padding: 8px;
 }
 
 #csp-dbg-row-ver {
