@@ -72,7 +72,7 @@
 							<?php if (is_array($dbgjson)): ?>
 								<?php foreach ($dbgjson as $field => $value): ?>
 								<div class="csp-dbg-json-field"><?php echo $field; ?></div>
-								<pre class="csp-dbg-json-value"><?php echo $value; ?></pre>
+								<pre class="csp-dbg-json-value"><?php echo (is_array($value)) ? 'array' : $value; ?></pre>
 								<?php endforeach; ?>
 							<?php endif; ?>
 						<?php endif; ?>
