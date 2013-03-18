@@ -147,6 +147,9 @@
 												case is_bool($arg):
 													echo ($arg) ? 'true' : 'false';
 													break;
+												case is_array($arg):
+													echo 'keys: '.join(', ', array_keys($arg));
+													break;
 												default:
 													echo $arg;
 											}
