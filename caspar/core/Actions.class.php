@@ -105,18 +105,28 @@
 		/**
 		 * Return the response object
 		 * 
-		 * @return TBGResponse
+		 * @return Response
 		 */
 		protected function getResponse()
 		{
 			return Caspar::getResponse();
 		}
-		
+
+		/**
+		 * Return the routing object
+		 *
+		 * @return Routing
+		 */
 		protected function getRouting()
 		{
 			return Caspar::getRouting();
 		}
 
+		/**
+		 * Return the i18n object
+		 *
+		 * @return I18n
+		 */
 		protected function getI18n()
 		{
 			return Caspar::getI18n();
